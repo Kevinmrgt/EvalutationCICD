@@ -83,7 +83,7 @@ git tag -l
 - **Docker Images** : Taggées automatiquement avec la version (ex: `app:v1.1.0`)
 - **Changelog** : Généré automatiquement à partir des commits conventionnels
 
-**Version actuelle :** `v1.1.0` 🎉
+**Version actuelle :** `v1.1.1` 🎉
 
 ## 📁 Structure du Projet
 
@@ -282,6 +282,7 @@ Le projet utilise un système de versionnement sémantique automatisé :
 - **v1.0.0** : Version initiale avec fonctionnalités de base
 - **v1.0.1** : Corrections de bugs et améliorations de sécurité  
 - **v1.1.0** : Ajout du monitoring avancé et système de snapshots
+- **v1.1.1** : Correction des erreurs de déploiement CI/CD et amélioration de la couverture de tests
 
 ### Création de Releases
 ```bash
