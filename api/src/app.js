@@ -8,6 +8,13 @@ require('dotenv').config();
 const logger = require('./config/logger');
 const routes = require('./routes');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
+const {
+  requestCounter,
+  detailedHealthCheck,
+  getMetricsPrometheus,
+  livenessProbe,
+  readinessProbe
+} = require('../../monitoring/health-checks');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,15 +40,31 @@ app.use(morgan('combined', { stream: { write: message => logger.info(message.tri
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    version: process.env.npm_package_version || '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
-  });
+// Request counting middleware
+app.use(requestCounter);
+
+// Health check endpoints
+app.get('/health', async (req, res) => {
+  try {
+    const health = await detailedHealthCheck();
+    res.status(200).json(health);
+  } catch (error) {
+    res.status(503).json({
+      status: 'ERROR',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Kubernetes-style probes
+app.get('/health/live', livenessProbe);
+app.get('/health/ready', readinessProbe);
+
+// Metrics endpoint (Prometheus-style)
+app.get('/metrics', (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.send(getMetricsPrometheus());
 });
 
 // API routes
@@ -50,7 +73,7 @@ app.use('/api', routes);
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'Bienvenue sur l\'API d\'évaluation CI/CD',
+    message: "Bienvenue sur l'API d'évaluation CI/CD",
     version: '1.0.0',
     documentation: '/api/docs',
     health: '/health'
