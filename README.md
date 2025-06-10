@@ -1,5 +1,12 @@
 # 🚀 Projet d'Évaluation CI/CD - API REST Node.js
 
+[![CI Tests](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/ci.yml/badge.svg)](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/ci.yml)
+[![CD Deploy](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/cd.yml/badge.svg)](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/cd.yml)
+[![Security Scan](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/security.yml/badge.svg)](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/security.yml)
+[![Docker Build](https://img.shields.io/docker/cloud/build/kevinmrgt/evalutationcicd)](https://hub.docker.com/r/kevinmrgt/evalutationcicd)
+[![Node.js Version](https://img.shields.io/node/v/evalutationcicd)](https://nodejs.org/)
+[![License](https://img.shields.io/github/license/Kevinmrgt/EvalutationCICD)](./LICENSE)
+
 ## 📋 Description du Projet
 
 Ce projet fait partie d'une évaluation complète de mise en œuvre d'un pipeline CI/CD. Il s'agit d'une API REST Node.js destinée à une application mobile, avec une infrastructure DevOps complète incluant :
