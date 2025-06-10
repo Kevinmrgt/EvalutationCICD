@@ -7,7 +7,7 @@ const tasksRoutes = require('./tasks');
 // Documentation de l'API
 router.get('/', (req, res) => {
   res.json({
-    message: "API d'évaluation CI/CD",
+    message: 'API d\'évaluation CI/CD',
     version: '1.0.0',
     endpoints: {
       users: '/api/users',
