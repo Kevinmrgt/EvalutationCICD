@@ -76,7 +76,7 @@ git show v1.0.0
 - **Docker Images** : Taggées automatiquement avec la version (ex: `app:v1.0.0`)
 - **Changelog** : Généré automatiquement à partir des commits conventionnels
 
-**Version actuelle :** `v1.0.0` 🎉
+**Version actuelle :** `v1.0.1` 🎉
 
 ## 📁 Structure du Projet
 
