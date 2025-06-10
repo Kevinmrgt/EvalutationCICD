@@ -18,7 +18,7 @@ describe('User Model', () => {
       expect(user.role).toBe('admin');
     });
 
-    it('should set default role to "user" if not provided', () => {
+    it("should set default role to 'user' if not provided", () => {
       const userData = {
         id: 1,
         name: 'Jane Doe',
