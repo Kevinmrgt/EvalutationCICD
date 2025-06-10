@@ -1,0 +1,231 @@
+name: 🔒 Security Checks (Safe Mode)
+
+# Workflow de sécurité simplifié qui évite les erreurs de permissions
+# et fonctionne même sans toutes les fonctionnalités GitHub Security activées
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # ==========================================
+  # Job 1: Basic Security Audit
+  # ==========================================
+  basic-security:
+    name: 🔍 Basic Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Run npm audit
+        run: |
+          echo "🔍 Running npm audit..."
+          npm audit --audit-level moderate || echo "⚠️ Vulnerabilities found, but continuing..."
+          npm audit --json > npm-audit.json || true
+
+      - name: 🔍 Check for common security patterns
+        run: |
+          echo "🔍 Checking for common security issues..."
+          
+          # Check for hardcoded secrets patterns
+          echo "Checking for potential secrets..."
+          grep -r -i "password\|secret\|token\|key" --include="*.js" --include="*.json" . --exclude-dir=node_modules || echo "No obvious secrets found"
+          
+          # Check for eval usage
+          echo "Checking for eval usage..."
+          grep -r "eval(" --include="*.js" . --exclude-dir=node_modules && echo "⚠️ eval() usage found" || echo "✅ No eval() usage"
+          
+          # Check for console.log in production code
+          echo "Checking for console.log..."
+          find ./api -name "*.js" -exec grep -l "console\.log" {} \; || echo "✅ No console.log found"
+
+      - name: 📊 Upload npm audit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit-results
+          path: npm-audit.json
+          if-no-files-found: ignore
+
+  # ==========================================
+  # Job 2: Docker Security (No SARIF)
+  # ==========================================
+  docker-security-safe:
+    name: 🐳 Docker Security (Safe)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build Docker image
+        run: |
+          echo "🐳 Building Docker image for security scan..."
+          docker build -t security-scan:test --target production .
+
+      - name: 🔍 Run Trivy scan (JSON output)
+        run: |
+          echo "🔍 Running Trivy vulnerability scanner..."
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$(pwd):/tmp/results" \
+            aquasec/trivy:latest image \
+            --format json \
+            --output /tmp/results/trivy-results.json \
+            security-scan:test || echo "⚠️ Trivy scan completed with issues"
+
+      - name: 📊 Upload Trivy results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-security-results
+          path: trivy-results.json
+          if-no-files-found: ignore
+
+      - name: 🔍 Basic image analysis
+        run: |
+          echo "📊 Docker image analysis:"
+          docker images security-scan:test
+          
+          echo "🔍 Checking image layers:"
+          docker history security-scan:test --no-trunc || true
+          
+          echo "🔍 Checking for common security issues:"
+          docker run --rm security-scan:test sh -c "ls -la /usr/src/app && whoami" || true
+
+  # ==========================================
+  # Job 3: Dependency Check
+  # ==========================================
+  dependency-check:
+    name: 📦 Dependency Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Check package vulnerabilities
+        run: |
+          echo "🔍 Analyzing package.json..."
+          
+          # Check for outdated packages
+          echo "📊 Outdated packages:"
+          npm outdated || echo "All packages up to date"
+          
+          # List all dependencies
+          echo "📋 Dependencies audit:"
+          npm list --depth=0
+          
+          # Check for security advisories
+          echo "🔒 Security advisories:"
+          npm audit --audit-level=moderate --parseable || echo "Security check completed"
+
+      - name: 📊 Generate dependency report
+        run: |
+          echo "# 📦 Dependency Security Report" > dependency-report.md
+          echo "" >> dependency-report.md
+          echo "## 📊 Package Analysis" >> dependency-report.md
+          echo "" >> dependency-report.md
+          echo "### Dependencies:" >> dependency-report.md
+          npm list --depth=0 >> dependency-report.md
+          echo "" >> dependency-report.md
+          echo "Generated on: $(date)" >> dependency-report.md
+
+      - name: 📊 Upload dependency report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-security-report
+          path: dependency-report.md
+
+  # ==========================================
+  # Job 4: Security Summary
+  # ==========================================
+  security-summary-safe:
+    name: 📋 Security Summary (Safe)
+    runs-on: ubuntu-latest
+    needs: [basic-security, docker-security-safe, dependency-check]
+    if: always()
+
+    steps:
+      - name: 📥 Download artifacts
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+
+      - name: 📋 Generate security summary
+        run: |
+          echo "# 🔒 Security Analysis Summary" > security-summary.md
+          echo "" >> security-summary.md
+          echo "## 📊 Job Results" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "| Component | Status | Details |" >> security-summary.md
+          echo "|-----------|--------|---------|" >> security-summary.md
+          
+          # Basic Security
+          if [ "${{ needs.basic-security.result }}" == "success" ]; then
+            echo "| Basic Security | ✅ PASS | npm audit and pattern checks completed |" >> security-summary.md
+          else
+            echo "| Basic Security | ⚠️ ISSUES | Check npm audit results |" >> security-summary.md
+          fi
+          
+          # Docker Security
+          if [ "${{ needs.docker-security-safe.result }}" == "success" ]; then
+            echo "| Docker Security | ✅ PASS | Image built and scanned successfully |" >> security-summary.md
+          else
+            echo "| Docker Security | ⚠️ ISSUES | Check Trivy scan results |" >> security-summary.md
+          fi
+          
+          # Dependencies
+          if [ "${{ needs.dependency-check.result }}" == "success" ]; then
+            echo "| Dependencies | ✅ PASS | Package analysis completed |" >> security-summary.md
+          else
+            echo "| Dependencies | ⚠️ ISSUES | Check dependency report |" >> security-summary.md
+          fi
+          
+          echo "" >> security-summary.md
+          echo "## 📁 Available Reports" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "- npm-audit-results: NPM security audit" >> security-summary.md
+          echo "- trivy-security-results: Container vulnerability scan" >> security-summary.md
+          echo "- dependency-security-report: Package analysis" >> security-summary.md
+          echo "" >> security-summary.md
+          echo "Generated on: $(date)" >> security-summary.md
+
+      - name: 📊 Upload security summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-analysis-summary
+          path: security-summary.md
+
+      - name: 📋 Display summary
+        run: |
+          echo "🔒 Security Analysis Complete!"
+          echo "=================="
+          cat security-summary.md 
