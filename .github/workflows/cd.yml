@@ -101,7 +101,7 @@ jobs:
       - name: 🔍 Health check staging
         run: |
           echo "🔍 Running health checks on staging..."
-          # curl -f https://staging.evalutationcicd.com/api/health || exit 1
+          # curl -f https://staging.evalutationcicd.com/health || exit 1
           echo "✅ Health checks passed!"
 
       - name: 📢 Notify staging deployment
@@ -142,7 +142,7 @@ jobs:
       - name: 🔍 Health check production
         run: |
           echo "🔍 Running health checks on production..."
-          # curl -f https://evalutationcicd.com/api/health || exit 1
+          # curl -f https://evalutationcicd.com/health || exit 1
           echo "✅ Health checks passed!"
 
       - name: 📢 Notify production deployment

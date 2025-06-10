@@ -7,6 +7,8 @@
     "start": "node api/src/app.js",
     "dev": "nodemon api/src/app.js",
     "test": "jest",
+    "test:unit": "jest --testMatch='**/api/tests/unit/**/*.test.js'",
+    "test:integration": "jest --testMatch='**/api/tests/integration/**/*.test.js'",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint api/src api/tests",

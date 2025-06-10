@@ -40,4 +40,16 @@ package.json
 
 # Test artifacts
 coverage/
-*.lcov 
+*.lcov
+
+# Snapshots
+snapshots/
+
+# Ansible
+ansible/
+
+# GitHub workflows (preserve YAML formatting)
+.github/
+
+# Scripts
+scripts/ 

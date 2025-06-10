@@ -39,7 +39,7 @@ jobs:
         run: npm run lint
 
       - name: 🎨 Check Prettier formatting
-        run: npx prettier --check .
+        run: npm run format:check
 
       - name: 🧪 Run unit tests
         run: npm run test:unit
@@ -122,7 +122,7 @@ jobs:
 
           # Test health endpoint
           docker exec test-container node -e "
-            require('http').get('http://localhost:3000/api/health', (res) => {
+            require('http').get('http://localhost:3000/health', (res) => {
               process.exit(res.statusCode === 200 ? 0 : 1)
             }).on('error', () => process.exit(1))
           "
@@ -152,6 +152,9 @@ jobs:
       - name: 📥 Install dependencies
         run: npm ci
 
+      - name: 📦 Install Artillery for performance tests
+        run: npm install -g artillery
+
       - name: 🚀 Start application
         run: |
           npm start &
@@ -159,10 +162,10 @@ jobs:
 
       - name: ⚡ Run performance tests
         run: |
-          npx artillery quick \
+          artillery quick \
             --duration 30s \
             --rate 10 \
-            http://localhost:3000/api/health
+            http://localhost:3000/health
 
       - name: 📊 Performance report
         run: echo "Performance tests completed"
