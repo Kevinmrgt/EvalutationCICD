@@ -154,7 +154,12 @@ npm run docker:run
 - `GET /` - Page d'accueil avec informations sur l'API
 - `GET /api` - Documentation des endpoints disponibles
 - `GET /api/docs` - Documentation détaillée de l'API
-- `GET /health` - Health check du serveur
+
+### Monitoring et Health Checks
+- `GET /health` - Health check détaillé avec métriques système
+- `GET /health/live` - Liveness probe (Kubernetes-style)
+- `GET /health/ready` - Readiness probe avec vérification des services
+- `GET /metrics` - Métriques Prometheus (format texte)
 
 ### Utilisateurs
 - `GET /api/users` - Liste des utilisateurs (avec pagination)
@@ -280,6 +285,39 @@ ansible-playbook playbooks/deploy.yml -e "app_version=v1.2.3"
 ./scripts/deploy.sh destroy -e dev --force    # Détruire l'environnement dev
 ```
 
+## 🏷️ Versionnement Sémantique
+
+Ce projet utilise [Semantic Versioning](https://semver.org/lang/fr/) (SemVer) pour la gestion des versions.
+
+### Format : MAJOR.MINOR.PATCH
+
+- **MAJOR** : Changements incompatibles de l'API
+- **MINOR** : Ajout de fonctionnalités rétrocompatibles  
+- **PATCH** : Corrections de bugs rétrocompatibles
+
+### Script de gestion des versions
+
+```bash
+# Voir la version actuelle
+./scripts/create-release.sh --current
+
+# Lister les tags existants
+./scripts/create-release.sh --list
+
+# Créer une nouvelle version
+./scripts/create-release.sh patch   # 1.0.0 -> 1.0.1
+./scripts/create-release.sh minor   # 1.0.1 -> 1.1.0  
+./scripts/create-release.sh major   # 1.1.0 -> 2.0.0
+
+# Version spécifique
+./scripts/create-release.sh 1.2.3
+```
+
+### Tags Git existants
+- `v1.0.0` - Version initiale
+- `v1.0.1` - Corrections de bugs
+- `v1.1.0` - Nouvelles fonctionnalités
+
 ## 🔧 Configuration
 
 ### Variables d'Environnement
@@ -305,9 +343,50 @@ Ce projet suit les conventions GitFlow :
 L'application inclut :
 - Logs structurés JSON avec Winston
 - Logs HTTP avec Morgan
-- Health checks sur `/health`
-- Métriques de performance
+- Health checks détaillés sur `/health`, `/health/live`, `/health/ready`
+- Métriques Prometheus sur `/metrics`
+- Monitoring des requêtes et erreurs en temps réel
 - Gestion des erreurs centralisée
+
+## 📸 Snapshots et Rollback
+
+### Création de snapshots
+
+```bash
+# Créer un snapshot complet
+./snapshots/create-snapshot.sh
+
+# Le snapshot inclut :
+# - Code de l'application
+# - Configuration (Docker, env)
+# - Infrastructure (Terraform, Ansible)
+# - Workflows CI/CD
+# - Métadonnées avec informations Git
+```
+
+### Stratégie de rollback
+
+```bash
+# Lister les snapshots disponibles
+ls snapshots/
+
+# Restaurer un snapshot spécifique
+./rollback/restore-snapshot.sh 2024-01-15_14-30-45
+
+# Le rollback inclut :
+# - Sauvegarde automatique avant restauration
+# - Restauration de l'application et configuration
+# - Réinstallation des dépendances
+# - Rapport de restauration détaillé
+```
+
+### Sécurité et traçabilité
+
+- ✅ Sauvegarde automatique avant chaque rollback
+- ✅ Métadonnées complètes (date, commit, tag)
+- ✅ Compression des snapshots pour économiser l'espace
+- ✅ Vérification post-restauration
+- ✅ Rapports détaillés de chaque opération
 
 ## 🔒 Sécurité
 
