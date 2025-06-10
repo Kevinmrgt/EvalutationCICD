@@ -43,6 +43,41 @@ Ce projet fait partie d'une évaluation complète de mise en œuvre d'un pipelin
 - **Morgan** - Logs HTTP
 - **Express Rate Limit** - Protection contre les attaques
 
+## 🏷️ Versionnement Sémantique
+
+Ce projet utilise le [versionnement sémantique (SemVer)](https://semver.org/) pour gérer les releases :
+
+- **MAJOR** (1.0.0 → 2.0.0) : Changements incompatibles de l'API
+- **MINOR** (1.0.0 → 1.1.0) : Nouvelles fonctionnalités compatibles
+- **PATCH** (1.0.0 → 1.0.1) : Corrections de bugs compatibles
+
+### 📋 Gestion des Releases
+
+```bash
+# Créer une nouvelle release patch (corrections de bugs)
+./scripts/create-release.sh patch "Fix security vulnerabilities"
+
+# Créer une nouvelle release minor (nouvelles fonctionnalités)
+./scripts/create-release.sh minor "Add new API endpoints"
+
+# Créer une nouvelle release major (changements majeurs)
+./scripts/create-release.sh major "Breaking changes in API"
+
+# Voir toutes les versions
+git tag -l
+
+# Voir les détails d'une version
+git show v1.0.0
+```
+
+### 📦 Artefacts et Releases
+
+- **GitHub Releases** : Chaque tag crée automatiquement une release sur GitHub
+- **Docker Images** : Taggées automatiquement avec la version (ex: `app:v1.0.0`)
+- **Changelog** : Généré automatiquement à partir des commits conventionnels
+
+**Version actuelle :** `v1.0.0` 🎉
+
 ## 📁 Structure du Projet
 
 ```
