@@ -112,23 +112,71 @@ jobs:
 
       - name: 🔍 Test Docker image
         run: |
+          echo "🐳 Starting Docker container..."
+          
+          # Start container in background
           docker run --rm -d \
             --name test-container \
             -p 3000:3000 \
             evalutationcicd:ci-test
 
           # Wait for container to start
-          sleep 10
+          echo "⏱️ Waiting for container to start..."
+          sleep 20
+
+          # Check if container is running
+          if ! docker ps | grep -q test-container; then
+            echo "❌ Container failed to start"
+            echo "📋 Container logs:"
+            docker logs test-container 2>/dev/null || echo "No logs available"
+            exit 1
+          fi
+
+          echo "✅ Container is running"
 
           # Test health endpoint
-          docker exec test-container node -e "
-            require('http').get('http://localhost:3000/health', (res) => {
-              process.exit(res.statusCode === 200 ? 0 : 1)
-            }).on('error', () => process.exit(1))
-          "
+          echo "🔍 Testing health endpoint..."
+          
+          # Simple health check using the main endpoint
+          if docker exec test-container node -e "
+            const http = require('http');
+            
+            console.log('Testing /health endpoint...');
+            const req = http.get('http://localhost:3000/health', (res) => {
+              console.log('Response status:', res.statusCode);
+              if (res.statusCode === 200) {
+                console.log('✅ Health check successful');
+                process.exit(0);
+              } else {
+                console.log('❌ Health check failed with status:', res.statusCode);
+                process.exit(1);
+              }
+            });
+            
+            req.on('error', (err) => {
+              console.log('❌ Request failed:', err.message);
+              process.exit(1);
+            });
+            
+            // Timeout after 10 seconds
+            setTimeout(() => {
+              console.log('❌ Health check timeout');
+              process.exit(1);
+            }, 10000);
+          "; then
+            echo "✅ Health check passed"
+          else
+            echo "❌ Health check failed"
+            echo "📋 Container logs:"
+            docker logs test-container
+            docker stop test-container || true
+            exit 1
+          fi
 
-          # Stop container
-          docker stop test-container
+          # Clean up - stop container
+          echo "🧹 Cleaning up..."
+          docker stop test-container || true
+          echo "✅ Container stopped successfully"
 
   # ==========================================
   # Job 4: Performance Tests
