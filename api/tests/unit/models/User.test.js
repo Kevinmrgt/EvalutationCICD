@@ -62,7 +62,7 @@ describe('User Model', () => {
           email: 'test@example.com'
         };
 
-        expect(() => User.create(userData)).toThrow('Le nom et l\'email sont requis');
+        expect(() => User.create(userData)).toThrow("Le nom et l'email sont requis");
       });
     });
   });

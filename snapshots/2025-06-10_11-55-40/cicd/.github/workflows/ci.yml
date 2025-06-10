@@ -17,39 +17,39 @@ jobs:
   test:
     name: 🧪 Tests & Code Quality
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [18.x, 20.x]
-    
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          
+
       - name: 📥 Install dependencies
         run: npm ci
-        
+
       - name: 🔍 Run ESLint
         run: npm run lint
-        
+
       - name: 🎨 Check Prettier formatting
         run: npx prettier --check .
-        
+
       - name: 🧪 Run unit tests
         run: npm run test:unit
-        
+
       - name: 🌐 Run integration tests
         run: npm run test:integration
-        
+
       - name: 📊 Generate coverage report
         run: npm run test:coverage
-        
+
       - name: 📈 Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -64,23 +64,23 @@ jobs:
   security:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: 📥 Install dependencies
         run: npm ci
-        
+
       - name: 🔍 Run npm audit
         run: npm audit --audit-level high
-        
+
       - name: 🛡️ Run Snyk security test
         uses: snyk/actions/node@master
         continue-on-error: true
@@ -94,14 +94,14 @@ jobs:
     name: 🐳 Docker Build Test
     runs-on: ubuntu-latest
     needs: [test]
-    
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: 🏗️ Build Docker image (test)
         run: |
           docker build \
@@ -109,24 +109,24 @@ jobs:
             --tag evalutationcicd:ci-test \
             --file Dockerfile \
             .
-            
+
       - name: 🔍 Test Docker image
         run: |
           docker run --rm -d \
             --name test-container \
             -p 3000:3000 \
             evalutationcicd:ci-test
-          
+
           # Wait for container to start
           sleep 10
-          
+
           # Test health endpoint
           docker exec test-container node -e "
             require('http').get('http://localhost:3000/api/health', (res) => {
               process.exit(res.statusCode === 200 ? 0 : 1)
             }).on('error', () => process.exit(1))
           "
-          
+
           # Stop container
           docker stop test-container
 
@@ -138,31 +138,31 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     if: github.event_name == 'pull_request'
-    
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: 📥 Install dependencies
         run: npm ci
-        
+
       - name: 🚀 Start application
         run: |
           npm start &
           sleep 10
-        
+
       - name: ⚡ Run performance tests
         run: |
           npx artillery quick \
             --duration 30s \
             --rate 10 \
             http://localhost:3000/api/health
-            
+
       - name: 📊 Performance report
-        run: echo "Performance tests completed" 
+        run: echo "Performance tests completed"

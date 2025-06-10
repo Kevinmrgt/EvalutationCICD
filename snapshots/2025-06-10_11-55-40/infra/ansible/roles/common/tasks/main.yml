@@ -2,9 +2,9 @@
 # Rôle common - Configuration de base pour tous les serveurs
 # Ce rôle contient les tâches communes à tous les types de serveurs
 
-- name: "🔧 Configuration de base du système"
+- name: '🔧 Configuration de base du système'
   block:
-    - name: "📦 Mise à jour du cache des packages"
+    - name: '📦 Mise à jour du cache des packages'
       yum:
         update_cache: yes
       register: cache_update
@@ -12,7 +12,7 @@
       delay: 5
       until: cache_update is succeeded
 
-    - name: "🔧 Installation des packages essentiels"
+    - name: '🔧 Installation des packages essentiels'
       yum:
         name:
           - curl
@@ -41,30 +41,30 @@
       delay: 5
       until: packages_install is succeeded
 
-    - name: "⏰ Configuration de la timezone"
+    - name: '⏰ Configuration de la timezone'
       timezone:
         name: "{{ timezone | default('UTC') }}"
       notify: restart chronyd
 
-    - name: "🕐 Configuration et démarrage de chronyd"
+    - name: '🕐 Configuration et démarrage de chronyd'
       service:
         name: chronyd
         state: started
         enabled: yes
 
-    - name: "🔧 Configuration du hostname"
+    - name: '🔧 Configuration du hostname'
       hostname:
-        name: "{{ inventory_hostname }}"
+        name: '{{ inventory_hostname }}'
       when: inventory_hostname is defined
 
-    - name: "📝 Mise à jour du fichier /etc/hosts"
+    - name: '📝 Mise à jour du fichier /etc/hosts'
       lineinfile:
         path: /etc/hosts
-        line: "127.0.0.1 {{ inventory_hostname }}"
+        line: '127.0.0.1 {{ inventory_hostname }}'
         backup: yes
       when: inventory_hostname is defined
 
-- name: "👤 Configuration des utilisateurs et sécurité"
+- name: '👤 Configuration des utilisateurs et sécurité'
   block:
     - name: "👤 Création de l'utilisateur applicatif"
       user:
@@ -73,15 +73,15 @@
         shell: /bin/bash
         home: "{{ app_dir | default('/opt/nodejs-app') }}"
         create_home: yes
-        comment: "Application User for Node.js"
+        comment: 'Application User for Node.js'
       register: app_user_created
 
     - name: "🔑 Configuration des clés SSH pour l'utilisateur applicatif"
       authorized_key:
         user: "{{ app_user | default('nodejs') }}"
-        key: "{{ item }}"
+        key: '{{ item }}'
         state: present
-      loop: "{{ ssh_public_keys | default([]) }}"
+      loop: '{{ ssh_public_keys | default([]) }}'
       when: ssh_public_keys is defined
 
     - name: "🔒 Configuration de sudo pour l'utilisateur applicatif"
@@ -92,24 +92,24 @@
         mode: '0440'
         validate: 'visudo -cf %s'
 
-- name: "🔧 Configuration du système et optimisations"
+- name: '🔧 Configuration du système et optimisations'
   block:
-    - name: "⚡ Optimisation des limites système"
+    - name: '⚡ Optimisation des limites système'
       pam_limits:
         domain: "{{ app_user | default('nodejs') }}"
-        limit_type: "{{ item.type }}"
-        limit_item: "{{ item.item }}"
-        value: "{{ item.value }}"
+        limit_type: '{{ item.type }}'
+        limit_item: '{{ item.item }}'
+        value: '{{ item.value }}'
       loop:
         - { type: 'soft', item: 'nofile', value: '65536' }
         - { type: 'hard', item: 'nofile', value: '65536' }
         - { type: 'soft', item: 'nproc', value: '32768' }
         - { type: 'hard', item: 'nproc', value: '32768' }
 
-    - name: "🔧 Configuration sysctl pour Node.js"
+    - name: '🔧 Configuration sysctl pour Node.js'
       sysctl:
-        name: "{{ item.name }}"
-        value: "{{ item.value }}"
+        name: '{{ item.name }}'
+        value: '{{ item.value }}'
         state: present
         reload: yes
       loop:
@@ -121,11 +121,11 @@
         - { name: 'net.ipv4.tcp_tw_reuse', value: '1' }
         - { name: 'vm.swappiness', value: '10' }
 
-- name: "📁 Configuration des répertoires"
+- name: '📁 Configuration des répertoires'
   block:
-    - name: "📁 Création des répertoires nécessaires"
+    - name: '📁 Création des répertoires nécessaires'
       file:
-        path: "{{ item }}"
+        path: '{{ item }}'
         state: directory
         owner: "{{ app_user | default('nodejs') }}"
         group: "{{ app_user | default('nodejs') }}"
@@ -146,16 +146,16 @@
       vars:
         log_files:
           - "{{ app_dir | default('/opt/nodejs-app') }}/logs/*.log"
-          - "/var/log/nodejs-app/*.log"
+          - '/var/log/nodejs-app/*.log'
 
 - name: "🔧 Installation et configuration d'outils de base"
   block:
-    - name: "🐍 Installation de pip3"
+    - name: '🐍 Installation de pip3'
       yum:
         name: python3-pip
         state: present
 
-    - name: "📦 Installation des packages Python utiles"
+    - name: '📦 Installation des packages Python utiles'
       pip:
         name:
           - boto3
@@ -170,12 +170,12 @@
         executable: pip3
       when: aws_cli_install | default(true) | bool
 
-- name: "📊 Configuration du monitoring de base"
+- name: '📊 Configuration du monitoring de base'
   block:
-    - name: "📈 Création des scripts de monitoring"
+    - name: '📈 Création des scripts de monitoring'
       template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
         mode: '0755'
         owner: root
         group: root
@@ -185,29 +185,29 @@
         - src: app-health.sh.j2
           dest: /usr/local/bin/app-health.sh
 
-    - name: "⏰ Configuration des tâches cron de monitoring"
+    - name: '⏰ Configuration des tâches cron de monitoring'
       cron:
-        name: "{{ item.name }}"
-        minute: "{{ item.minute }}"
+        name: '{{ item.name }}'
+        minute: '{{ item.minute }}'
         hour: "{{ item.hour | default('*') }}"
-        job: "{{ item.job }}"
+        job: '{{ item.job }}'
         user: root
       loop:
-        - name: "System Health Check"
-          minute: "*/5"
-          job: "/usr/local/bin/system-health.sh >> /var/log/system-health.log 2>&1"
-        - name: "Application Health Check"
-          minute: "*/2"
-          job: "/usr/local/bin/app-health.sh >> /var/log/app-health.log 2>&1"
+        - name: 'System Health Check'
+          minute: '*/5'
+          job: '/usr/local/bin/system-health.sh >> /var/log/system-health.log 2>&1'
+        - name: 'Application Health Check'
+          minute: '*/2'
+          job: '/usr/local/bin/app-health.sh >> /var/log/app-health.log 2>&1'
 
-- name: "🧹 Nettoyage et finalisation"
+- name: '🧹 Nettoyage et finalisation'
   block:
-    - name: "🗑️ Nettoyage du cache des packages"
+    - name: '🗑️ Nettoyage du cache des packages'
       yum:
         autoremove: yes
       when: cleanup_packages | default(true) | bool
 
-    - name: "📝 Enregistrement des informations système"
+    - name: '📝 Enregistrement des informations système'
       template:
         src: system-info.yml.j2
         dest: "{{ app_dir | default('/opt/nodejs-app') }}/system-info.yml"
@@ -216,25 +216,25 @@
         group: "{{ app_user | default('nodejs') }}"
       vars:
         system_info:
-          hostname: "{{ inventory_hostname }}"
-          ip_address: "{{ ansible_default_ipv4.address }}"
-          os_version: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
-          kernel_version: "{{ ansible_kernel }}"
-          total_memory: "{{ ansible_memtotal_mb }}MB"
-          cpu_count: "{{ ansible_processor_vcpus }}"
-          deployment_date: "{{ ansible_date_time.iso8601 }}"
+          hostname: '{{ inventory_hostname }}'
+          ip_address: '{{ ansible_default_ipv4.address }}'
+          os_version: '{{ ansible_distribution }} {{ ansible_distribution_version }}'
+          kernel_version: '{{ ansible_kernel }}'
+          total_memory: '{{ ansible_memtotal_mb }}MB'
+          cpu_count: '{{ ansible_processor_vcpus }}'
+          deployment_date: '{{ ansible_date_time.iso8601 }}'
 
-    - name: "✅ Vérification finale de la configuration"
+    - name: '✅ Vérification finale de la configuration'
       command: systemctl status chronyd
       register: chronyd_status
       failed_when: false
       changed_when: false
 
-    - name: "📊 Affichage du statut de configuration"
+    - name: '📊 Affichage du statut de configuration'
       debug:
         msg:
-          - "✅ Configuration de base terminée"
+          - '✅ Configuration de base terminée'
           - "👤 Utilisateur applicatif: {{ app_user | default('nodejs') }}"
           - "📁 Répertoire application: {{ app_dir | default('/opt/nodejs-app') }}"
           - "⏰ Timezone: {{ timezone | default('UTC') }}"
-          - "🕐 Chronyd status: {{ 'active' if chronyd_status.rc == 0 else 'inactive' }}" 
+          - "🕐 Chronyd status: {{ 'active' if chronyd_status.rc == 0 else 'inactive' }}"

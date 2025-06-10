@@ -6,10 +6,7 @@ module.exports = {
     node: true,
     jest: true
   },
-  extends: [
-    'eslint:recommended',
-    'prettier'
-  ],
+  extends: ['eslint:recommended', 'prettier'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
@@ -20,59 +17,59 @@ module.exports = {
   },
   rules: {
     // Style et syntaxe
-    'indent': ['error', 2],
+    indent: ['error', 2],
     'linebreak-style': ['error', 'unix'],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'always'],
-    
+    quotes: ['error', 'single'],
+    semi: ['error', 'always'],
+
     // Variables
-    'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-var': 'error',
     'prefer-const': 'error',
-    
+
     // Fonctions
     'no-unused-expressions': 'error',
     'no-undef': 'error',
     'no-console': 'warn',
-    
+
     // Objets et arrays
     'object-curly-spacing': ['error', 'always'],
     'array-bracket-spacing': ['error', 'never'],
-    
+
     // Espaces
     'space-before-blocks': 'error',
     'space-before-function-paren': ['error', 'never'],
     'space-in-parens': ['error', 'never'],
     'space-infix-ops': 'error',
-    
+
     // Complexité
-    'complexity': ['warn', 10],
+    complexity: ['warn', 10],
     'max-depth': ['warn', 4],
-    'max-len': ['warn', { 'code': 120, 'ignoreUrls': true }],
+    'max-len': ['warn', { code: 120, ignoreUrls: true }],
     'max-lines': ['warn', 500],
-    
+
     // Bonnes pratiques
-    'curly': 'error',
+    curly: 'error',
     'dot-notation': 'error',
-    'eqeqeq': ['error', 'always'],
+    eqeqeq: ['error', 'always'],
     'no-eval': 'error',
     'no-implied-eval': 'error',
     'no-new-func': 'error',
     'no-return-assign': 'error',
     'no-throw-literal': 'error',
     'prefer-arrow-callback': 'warn',
-    
+
     // Async/Promise
     'no-async-promise-executor': 'error',
     'no-await-in-loop': 'warn',
     'prefer-promise-reject-errors': 'error',
-    
+
     // ES6+
     'arrow-spacing': 'error',
     'no-duplicate-imports': 'error',
     'object-shorthand': 'warn',
     'prefer-template': 'warn',
-    
+
     // Sécurité
     'no-eval': 'error',
     'no-implied-eval': 'error',
@@ -100,4 +97,4 @@ module.exports = {
       }
     }
   ]
-}; 
+};

@@ -55,11 +55,11 @@ class User {
   // Méthode statique pour créer un nouvel utilisateur
   static create(data) {
     if (!data.name || !data.email) {
-      throw new Error('Le nom et l\'email sont requis');
+      throw new Error("Le nom et l'email sont requis");
     }
 
     if (!User.isValidEmail(data.email)) {
-      throw new Error('Format d\'email invalide');
+      throw new Error("Format d'email invalide");
     }
 
     return new User({

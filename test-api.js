@@ -17,7 +17,7 @@ function makeRequest(path, method = 'GET', data = null) {
       path: url.pathname + url.search,
       method: method,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       }
     };
 
@@ -26,9 +26,9 @@ function makeRequest(path, method = 'GET', data = null) {
       options.headers['Content-Length'] = Buffer.byteLength(postData);
     }
 
-    const req = http.request(options, (res) => {
+    const req = http.request(options, res => {
       let body = '';
-      res.on('data', (chunk) => {
+      res.on('data', chunk => {
         body += chunk;
       });
       res.on('end', () => {
@@ -41,7 +41,7 @@ function makeRequest(path, method = 'GET', data = null) {
       });
     });
 
-    req.on('error', (err) => {
+    req.on('error', err => {
       reject(err);
     });
 
@@ -55,7 +55,7 @@ function makeRequest(path, method = 'GET', data = null) {
 
 // Tests de l'API
 async function testAPI() {
-  console.log('🧪 Test de l\'API d\'évaluation CI/CD\n');
+  console.log("🧪 Test de l'API d'évaluation CI/CD\n");
 
   try {
     // Test 1: Health check
@@ -66,7 +66,7 @@ async function testAPI() {
     console.log(`   Environment: ${health.data.environment}\n`);
 
     // Test 2: Page d'accueil
-    console.log('2️⃣ Test de la page d\'accueil...');
+    console.log("2️⃣ Test de la page d'accueil...");
     const home = await makeRequest('/');
     console.log(`   Status: ${home.status}`);
     console.log(`   Message: ${home.data.message}\n`);
@@ -92,7 +92,7 @@ async function testAPI() {
     console.log(`   Première tâche: ${tasks.data.data[0].title}\n`);
 
     // Test 6: Création d'un utilisateur
-    console.log('6️⃣ Test de création d\'un utilisateur...');
+    console.log("6️⃣ Test de création d'un utilisateur...");
     const newUser = await makeRequest('/api/users', 'POST', {
       name: 'Test User',
       email: 'test@example.com',
@@ -106,10 +106,10 @@ async function testAPI() {
     }
 
     // Test 7: Création d'une tâche
-    console.log('7️⃣ Test de création d\'une tâche...');
+    console.log("7️⃣ Test de création d'une tâche...");
     const newTask = await makeRequest('/api/tasks', 'POST', {
       title: 'Tâche de test',
-      description: 'Cette tâche est créée pour tester l\'API',
+      description: "Cette tâche est créée pour tester l'API",
       priority: 'medium',
       status: 'pending'
     });
@@ -127,7 +127,6 @@ async function testAPI() {
     console.log(`   Message: ${notFound.data.error?.message}\n`);
 
     console.log('✅ Tous les tests sont terminés !');
-
   } catch (error) {
     console.error('❌ Erreur lors des tests:', error.message);
     console.log('\n💡 Assurez-vous que le serveur est démarré avec: npm start');
@@ -147,7 +146,7 @@ async function checkServer() {
 // Point d'entrée
 async function main() {
   const serverRunning = await checkServer();
-  
+
   if (!serverRunning) {
     console.log('❌ Le serveur ne semble pas être démarré.');
     console.log('💡 Démarrez le serveur avec: npm start');
@@ -158,4 +157,4 @@ async function main() {
   await testAPI();
 }
 
-main(); 
+main();

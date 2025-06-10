@@ -5,7 +5,7 @@ on:
     branches: [main]
     tags: ['v*']
   workflow_run:
-    workflows: ["🧪 CI - Tests & Quality"]
+    workflows: ['🧪 CI - Tests & Quality']
     types: [completed]
     branches: [main]
 
@@ -22,29 +22,29 @@ jobs:
     name: 🏗️ Build & Push Docker Image
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
-    
+
     outputs:
       image-digest: ${{ steps.build.outputs.digest }}
       image-tag: ${{ steps.meta.outputs.tags }}
-    
+
     permissions:
       contents: read
       packages: write
-      
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: 🔐 Log in to Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: 🏷️ Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -57,7 +57,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=commit-
             type=raw,value=latest,enable={{is_default_branch}}
-            
+
       - name: 🏗️ Build and push Docker image
         id: build
         uses: docker/build-push-action@v5
@@ -80,30 +80,30 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-and-push]
     if: github.ref == 'refs/heads/main'
-    
+
     environment:
       name: staging
       url: https://staging.evalutationcicd.com
-      
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 🚀 Deploy to staging
         run: |
           echo "🚀 Deploying to staging environment..."
           echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
           echo "Digest: ${{ needs.build-and-push.outputs.image-digest }}"
-          
+
           # Simulation du déploiement
           echo "✅ Staging deployment completed!"
-          
+
       - name: 🔍 Health check staging
         run: |
           echo "🔍 Running health checks on staging..."
           # curl -f https://staging.evalutationcicd.com/api/health || exit 1
           echo "✅ Health checks passed!"
-          
+
       - name: 📢 Notify staging deployment
         run: |
           echo "📢 Staging deployment notification sent"
@@ -116,35 +116,35 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-and-push, deploy-staging]
     if: github.ref == 'refs/heads/main'
-    
+
     environment:
       name: production
       url: https://evalutationcicd.com
-      
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: ⏸️ Manual approval checkpoint
         run: |
           echo "⏸️ Manual approval required for production deployment"
           echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
-          
+
       - name: 🌟 Deploy to production
         run: |
           echo "🌟 Deploying to production environment..."
           echo "Image: ${{ needs.build-and-push.outputs.image-tag }}"
           echo "Digest: ${{ needs.build-and-push.outputs.image-digest }}"
-          
+
           # Simulation du déploiement en production
           echo "✅ Production deployment completed!"
-          
+
       - name: 🔍 Health check production
         run: |
           echo "🔍 Running health checks on production..."
           # curl -f https://evalutationcicd.com/api/health || exit 1
           echo "✅ Health checks passed!"
-          
+
       - name: 📢 Notify production deployment
         run: |
           echo "📢 Production deployment notification sent"
@@ -156,21 +156,21 @@ jobs:
     name: 🔒 Security Scan
     runs-on: ubuntu-latest
     needs: [build-and-push]
-    
+
     permissions:
       security-events: write
-      
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: 🔍 Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ needs.build-and-push.outputs.image-tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
-          
+
       - name: 📊 Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: always()
@@ -185,16 +185,16 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [build-and-push, deploy-production]
-    
+
     permissions:
       contents: write
-      
+
     steps:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: 📋 Generate changelog
         id: changelog
         run: |
@@ -202,7 +202,7 @@ jobs:
           git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD~1)..HEAD >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          
+
       - name: 📦 Create Release
         uses: actions/create-release@v1
         env:
@@ -212,14 +212,14 @@ jobs:
           release_name: Release ${{ github.ref_name }}
           body: |
             ## 🚀 Release ${{ github.ref_name }}
-            
+
             ### 📋 Changes
             ${{ steps.changelog.outputs.changelog }}
-            
+
             ### 🐳 Docker Images
             - `${{ needs.build-and-push.outputs.image-tag }}`
-            
+
             ### 🔍 Image Digest
             `${{ needs.build-and-push.outputs.image-digest }}`
           draft: false
-          prerelease: false 
+          prerelease: false

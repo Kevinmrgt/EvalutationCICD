@@ -2,21 +2,21 @@
 # Rôle nodejs - Installation et configuration de Node.js et PM2
 # Ce rôle installe Node.js, npm, PM2 et configure l'environnement d'exécution
 
-- name: "📋 Vérification des prérequis Node.js"
+- name: '📋 Vérification des prérequis Node.js'
   block:
-    - name: "🔍 Vérification de la version Node.js existante"
+    - name: '🔍 Vérification de la version Node.js existante'
       command: node --version
       register: current_node_version
       failed_when: false
       changed_when: false
 
-    - name: "📊 Affichage de la version Node.js actuelle"
+    - name: '📊 Affichage de la version Node.js actuelle'
       debug:
         msg: "Version Node.js actuelle: {{ current_node_version.stdout | default('Non installé') }}"
 
 - name: "📦 Installation de Node.js {{ node_version | default('18') }}"
   block:
-    - name: "🔧 Ajout du repository NodeSource"
+    - name: '🔧 Ajout du repository NodeSource'
       shell: |
         curl -fsSL https://rpm.nodesource.com/setup_{{ node_version | default('18') }}.x | bash -
       args:
@@ -25,7 +25,7 @@
       retries: 3
       delay: 5
 
-    - name: "📦 Installation de Node.js via yum"
+    - name: '📦 Installation de Node.js via yum'
       yum:
         name: nodejs
         state: present
@@ -35,24 +35,24 @@
       until: nodejs_install is succeeded
 
     - name: "✅ Vérification de l'installation Node.js"
-      command: "{{ item }}"
+      command: '{{ item }}'
       register: node_check
       changed_when: false
       loop:
-        - "node --version"
-        - "npm --version"
+        - 'node --version'
+        - 'npm --version'
 
-    - name: "📊 Affichage des versions installées"
+    - name: '📊 Affichage des versions installées'
       debug:
         msg:
-          - "Node.js version: {{ node_check.results[0].stdout }}"
-          - "npm version: {{ node_check.results[1].stdout }}"
+          - 'Node.js version: {{ node_check.results[0].stdout }}'
+          - 'npm version: {{ node_check.results[1].stdout }}'
 
-- name: "🔧 Configuration npm"
+- name: '🔧 Configuration npm'
   block:
-    - name: "⚙️ Configuration npm globale"
+    - name: '⚙️ Configuration npm globale'
       npm:
-        name: "{{ item }}"
+        name: '{{ item }}'
         global: yes
         state: present
       loop:
@@ -63,16 +63,16 @@
       delay: 5
       until: npm_global_install is succeeded
 
-    - name: "🔧 Configuration du cache npm"
+    - name: '🔧 Configuration du cache npm'
       shell: |
         npm config set cache {{ app_dir | default('/opt/nodejs-app') }}/.npm-cache
         npm config set tmp {{ app_dir | default('/opt/nodejs-app') }}/tmp
       become_user: "{{ app_user | default('nodejs') }}"
       become: yes
 
-    - name: "📁 Création du répertoire cache npm"
+    - name: '📁 Création du répertoire cache npm'
       file:
-        path: "{{ item }}"
+        path: '{{ item }}'
         state: directory
         owner: "{{ app_user | default('nodejs') }}"
         group: "{{ app_user | default('nodejs') }}"
@@ -81,27 +81,27 @@
         - "{{ app_dir | default('/opt/nodejs-app') }}/.npm-cache"
         - "{{ app_dir | default('/opt/nodejs-app') }}/node_modules"
 
-- name: "🚀 Configuration de PM2"
+- name: '🚀 Configuration de PM2'
   block:
     - name: "✅ Vérification de l'installation PM2"
       command: pm2 --version
       register: pm2_version
       changed_when: false
 
-    - name: "📊 Affichage de la version PM2"
+    - name: '📊 Affichage de la version PM2'
       debug:
-        msg: "PM2 version: {{ pm2_version.stdout }}"
+        msg: 'PM2 version: {{ pm2_version.stdout }}'
 
     - name: "🔧 Configuration PM2 pour l'utilisateur applicatif"
       become_user: "{{ app_user | default('nodejs') }}"
       become: yes
       block:
-        - name: "🚀 Initialisation PM2"
+        - name: '🚀 Initialisation PM2'
           command: pm2 startup
           register: pm2_startup
           changed_when: false
 
-        - name: "📝 Configuration du fichier ecosystem PM2"
+        - name: '📝 Configuration du fichier ecosystem PM2'
           template:
             src: ecosystem.config.js.j2
             dest: "{{ app_dir | default('/opt/nodejs-app') }}/ecosystem.config.js"
@@ -109,9 +109,9 @@
             owner: "{{ app_user | default('nodejs') }}"
             group: "{{ app_user | default('nodejs') }}"
 
-        - name: "📁 Création des répertoires PM2"
+        - name: '📁 Création des répertoires PM2'
           file:
-            path: "{{ item }}"
+            path: '{{ item }}'
             state: directory
             owner: "{{ app_user | default('nodejs') }}"
             group: "{{ app_user | default('nodejs') }}"
@@ -121,20 +121,20 @@
             - "{{ app_dir | default('/opt/nodejs-app') }}/.pm2/logs"
             - "{{ app_dir | default('/opt/nodejs-app') }}/.pm2/pids"
 
-    - name: "🔧 Configuration du service PM2 système"
+    - name: '🔧 Configuration du service PM2 système'
       block:
-        - name: "📝 Création du service systemd pour PM2"
+        - name: '📝 Création du service systemd pour PM2'
           template:
             src: pm2.service.j2
             dest: /etc/systemd/system/pm2-{{ app_user | default('nodejs') }}.service
             mode: '0644'
           notify: reload systemd
 
-        - name: "🔄 Rechargement de systemd"
+        - name: '🔄 Rechargement de systemd'
           systemd:
             daemon_reload: yes
 
-        - name: "🚀 Activation du service PM2"
+        - name: '🚀 Activation du service PM2'
           systemd:
             name: "pm2-{{ app_user | default('nodejs') }}"
             enabled: yes
@@ -161,17 +161,17 @@
         owner: "{{ app_user | default('nodejs') }}"
         group: "{{ app_user | default('nodejs') }}"
 
-    - name: "📋 Configuration de logrotate pour PM2"
+    - name: '📋 Configuration de logrotate pour PM2'
       template:
         src: pm2-logrotate.conf.j2
         dest: /etc/logrotate.d/pm2-{{ app_user | default('nodejs') }}
         mode: '0644'
 
-- name: "🛠️ Outils de développement et utilitaires"
+- name: '🛠️ Outils de développement et utilitaires'
   block:
     - name: "📦 Installation d'outils npm globaux utiles"
       npm:
-        name: "{{ item }}"
+        name: '{{ item }}'
         global: yes
         state: present
       loop:
@@ -181,7 +181,7 @@
         - yarn
       when: install_dev_tools | default(true) | bool
 
-    - name: "🔧 Installation de packages système pour la compilation"
+    - name: '🔧 Installation de packages système pour la compilation'
       yum:
         name:
           - gcc-c++
@@ -190,33 +190,33 @@
         state: present
       when: install_build_tools | default(true) | bool
 
-- name: "🏥 Tests de santé et validation"
+- name: '🏥 Tests de santé et validation'
   block:
-    - name: "🧪 Test de fonctionnement de Node.js"
+    - name: '🧪 Test de fonctionnement de Node.js'
       shell: |
         echo "console.log('Node.js test:', process.version);" | node
       register: node_test
       changed_when: false
 
-    - name: "🧪 Test de fonctionnement de PM2"
+    - name: '🧪 Test de fonctionnement de PM2'
       command: pm2 list
       become_user: "{{ app_user | default('nodejs') }}"
       become: yes
       register: pm2_test
       changed_when: false
 
-    - name: "📊 Affichage des résultats de test"
+    - name: '📊 Affichage des résultats de test'
       debug:
         msg:
-          - "Node.js test result: {{ node_test.stdout }}"
+          - 'Node.js test result: {{ node_test.stdout }}'
           - "PM2 status: {{ 'OK' if pm2_test.rc == 0 else 'FAILED' }}"
 
-- name: "📋 Scripts utilitaires"
+- name: '📋 Scripts utilitaires'
   block:
-    - name: "📝 Création des scripts de gestion Node.js"
+    - name: '📝 Création des scripts de gestion Node.js'
       template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
         mode: '0755'
         owner: root
         group: root
@@ -230,10 +230,10 @@
         - src: app-logs.sh.j2
           dest: /usr/local/bin/app-logs.sh
 
-    - name: "🔗 Création de liens symboliques utiles"
+    - name: '🔗 Création de liens symboliques utiles'
       file:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
         state: link
         force: yes
       loop:
@@ -246,29 +246,29 @@
 
 - name: "✅ Finalisation de l'installation Node.js"
   block:
-    - name: "📊 Collecte des informations Node.js"
+    - name: '📊 Collecte des informations Node.js'
       set_fact:
         nodejs_info:
-          node_version: "{{ node_check.results[0].stdout }}"
-          npm_version: "{{ node_check.results[1].stdout }}"
-          pm2_version: "{{ pm2_version.stdout }}"
-          installation_date: "{{ ansible_date_time.iso8601 }}"
+          node_version: '{{ node_check.results[0].stdout }}'
+          npm_version: '{{ node_check.results[1].stdout }}'
+          pm2_version: '{{ pm2_version.stdout }}'
+          installation_date: '{{ ansible_date_time.iso8601 }}'
           app_user: "{{ app_user | default('nodejs') }}"
           app_dir: "{{ app_dir | default('/opt/nodejs-app') }}"
 
-    - name: "📝 Sauvegarde des informations Node.js"
+    - name: '📝 Sauvegarde des informations Node.js'
       copy:
-        content: "{{ nodejs_info | to_nice_yaml }}"
+        content: '{{ nodejs_info | to_nice_yaml }}'
         dest: "{{ app_dir | default('/opt/nodejs-app') }}/nodejs-info.yml"
         mode: '0644'
         owner: "{{ app_user | default('nodejs') }}"
         group: "{{ app_user | default('nodejs') }}"
 
-    - name: "🎉 Installation Node.js terminée"
+    - name: '🎉 Installation Node.js terminée'
       debug:
         msg:
-          - "✅ Node.js {{ node_check.results[0].stdout }} installé avec succès"
-          - "✅ PM2 {{ pm2_version.stdout }} configuré"
+          - '✅ Node.js {{ node_check.results[0].stdout }} installé avec succès'
+          - '✅ PM2 {{ pm2_version.stdout }} configuré'
           - "📁 Application directory: {{ app_dir | default('/opt/nodejs-app') }}"
           - "👤 Application user: {{ app_user | default('nodejs') }}"
-          - "🔧 Service PM2: pm2-{{ app_user | default('nodejs') }}" 
+          - "🔧 Service PM2: pm2-{{ app_user | default('nodejs') }}"

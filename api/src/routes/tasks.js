@@ -9,7 +9,7 @@ const tasks = [
   {
     id: 1,
     title: 'Configurer le pipeline CI/CD',
-    description: 'Mettre en place GitHub Actions pour l\'automatisation',
+    description: "Mettre en place GitHub Actions pour l'automatisation",
     status: 'in-progress',
     priority: 'high',
     assignedTo: 1,

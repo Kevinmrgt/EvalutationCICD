@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestCounter);
 
 // Health check endpoints
-app.get('/health', async(req, res) => {
+app.get('/health', async (req, res) => {
   try {
     const health = await detailedHealthCheck();
     res.status(200).json(health);
@@ -73,7 +73,7 @@ app.use('/api', routes);
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'Bienvenue sur l\'API d\'évaluation CI/CD',
+    message: "Bienvenue sur l'API d'évaluation CI/CD",
     version: '1.0.0',
     documentation: '/api/docs',
     health: '/health'
