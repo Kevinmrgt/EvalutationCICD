@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+logs/
+monitoring/logs/
+
+# Environment files
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Terraform
+*.tfstate
+*.tfvars
+
+# Markdown (preserve formatting)
+*.md
+
+# JSON files (preserve structure)
+package.json
+
+# Test artifacts
+coverage/
+*.lcov 
