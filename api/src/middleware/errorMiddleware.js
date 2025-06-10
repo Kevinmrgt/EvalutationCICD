@@ -9,7 +9,7 @@ const notFound = (req, res, next) => {
 };
 
 // Middleware de gestion des erreurs
-const errorHandler = (err, req, res, _next) => {
+const errorHandler = (err, req, res) => {
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
 
   // Log de l'erreur
@@ -20,7 +20,7 @@ const errorHandler = (err, req, res, _next) => {
     method: req.method,
     ip: req.ip,
     userAgent: req.get('User-Agent'),
-    statusCode
+    statusCode,
   });
 
   res.status(statusCode);
@@ -30,7 +30,7 @@ const errorHandler = (err, req, res, _next) => {
     statusCode,
     timestamp: new Date().toISOString(),
     path: req.originalUrl,
-    method: req.method
+    method: req.method,
   };
 
   // En développement, inclure la stack trace
@@ -39,12 +39,12 @@ const errorHandler = (err, req, res, _next) => {
   }
 
   res.json({
-    error: errorResponse
+    error: errorResponse,
   });
 };
 
 // Middleware de validation des données
-const validateRequest = schema => {
+const validateRequest = (schema) => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req.body);
 
@@ -53,19 +53,19 @@ const validateRequest = schema => {
         details: error.details,
         url: req.originalUrl,
         method: req.method,
-        body: req.body
+        body: req.body,
       });
 
       return res.status(400).json({
         error: {
           message: 'Données de requête invalides',
-          details: error.details.map(detail => ({
+          details: error.details.map((detail) => ({
             field: detail.path.join('.'),
-            message: detail.message
+            message: detail.message,
           })),
           statusCode: 400,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
     }
 
@@ -77,5 +77,5 @@ const validateRequest = schema => {
 module.exports = {
   notFound,
   errorHandler,
-  validateRequest
+  validateRequest,
 };

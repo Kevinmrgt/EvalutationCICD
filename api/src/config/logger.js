@@ -16,7 +16,7 @@ const logger = winston.createLogger({
   format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), errors({ stack: true }), json()),
   defaultMeta: {
     service: 'evalutationcicd-api',
-    version: process.env.npm_package_version || '1.0.0'
+    version: process.env.npm_package_version || '1.0.0',
   },
   transports: [
     // Write all logs with importance level of `error` or less to `error.log`
@@ -24,15 +24,15 @@ const logger = winston.createLogger({
       filename: path.join(logDir, 'error.log'),
       level: 'error',
       maxsize: 5242880, // 5MB
-      maxFiles: 5
+      maxFiles: 5,
     }),
     // Write all logs with importance level of `info` or less to `combined.log`
     new winston.transports.File({
       filename: path.join(logDir, 'combined.log'),
       maxsize: 5242880, // 5MB
-      maxFiles: 5
-    })
-  ]
+      maxFiles: 5,
+    }),
+  ],
 });
 
 // If we're not in production then log to the `console` with the format:
@@ -40,17 +40,17 @@ const logger = winston.createLogger({
 if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
-      format: combine(colorize(), timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), consoleFormat)
-    })
+      format: combine(colorize(), timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), consoleFormat),
+    }),
   );
 }
 
 // Create a stream object with a 'write' function that will be used by `morgan`
 logger.stream = {
-  write(message, _encoding) {
+  write(message) {
     // Use the 'info' log level so the output will be picked up by both transports
     logger.info(message.trim());
-  }
+  },
 };
 
 module.exports = logger;

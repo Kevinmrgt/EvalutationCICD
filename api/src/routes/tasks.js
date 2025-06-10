@@ -15,7 +15,7 @@ const tasks = [
     assignedTo: 1,
     created: new Date(),
     updated: new Date(),
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 jours
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 jours
   },
   {
     id: 2,
@@ -26,8 +26,8 @@ const tasks = [
     assignedTo: 2,
     created: new Date(),
     updated: new Date(),
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 jours
-  }
+    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 jours
+  },
 ];
 let nextId = 3;
 
@@ -38,7 +38,7 @@ const createTaskSchema = Joi.object({
   status: Joi.string().valid('pending', 'in-progress', 'completed', 'cancelled').default('pending'),
   priority: Joi.string().valid('low', 'medium', 'high', 'urgent').default('medium'),
   assignedTo: Joi.number().integer().positive().optional(),
-  dueDate: Joi.date().greater('now').optional()
+  dueDate: Joi.date().greater('now').optional(),
 });
 
 const updateTaskSchema = Joi.object({
@@ -47,7 +47,7 @@ const updateTaskSchema = Joi.object({
   status: Joi.string().valid('pending', 'in-progress', 'completed', 'cancelled').optional(),
   priority: Joi.string().valid('low', 'medium', 'high', 'urgent').optional(),
   assignedTo: Joi.number().integer().positive().allow(null).optional(),
-  dueDate: Joi.date().allow(null).optional()
+  dueDate: Joi.date().allow(null).optional(),
 });
 
 // GET /api/tasks - Récupérer toutes les tâches
@@ -60,17 +60,17 @@ router.get('/', (req, res) => {
 
   // Filtrage par statut
   if (status) {
-    filteredTasks = filteredTasks.filter(task => task.status === status);
+    filteredTasks = filteredTasks.filter((task) => task.status === status);
   }
 
   // Filtrage par priorité
   if (priority) {
-    filteredTasks = filteredTasks.filter(task => task.priority === priority);
+    filteredTasks = filteredTasks.filter((task) => task.priority === priority);
   }
 
   // Filtrage par assignation
   if (assignedTo) {
-    filteredTasks = filteredTasks.filter(task => task.assignedTo === parseInt(assignedTo));
+    filteredTasks = filteredTasks.filter((task) => task.assignedTo === parseInt(assignedTo));
   }
 
   // Tri par date de création (plus récent en premier)
@@ -88,28 +88,28 @@ router.get('/', (req, res) => {
       totalPages: Math.ceil(filteredTasks.length / limit),
       totalTasks: filteredTasks.length,
       hasNext: endIndex < filteredTasks.length,
-      hasPrev: startIndex > 0
+      hasPrev: startIndex > 0,
     },
     filters: {
       status: status || null,
       priority: priority || null,
-      assignedTo: assignedTo ? parseInt(assignedTo) : null
-    }
+      assignedTo: assignedTo ? parseInt(assignedTo) : null,
+    },
   });
 });
 
 // GET /api/tasks/:id - Récupérer une tâche par ID
 router.get('/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const task = tasks.find(t => t.id === id);
+  const task = tasks.find((t) => t.id === id);
 
   if (!task) {
     logger.warn(`Tâche non trouvée: ID ${id}`);
     return res.status(404).json({
       error: {
         message: 'Tâche non trouvée',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -125,7 +125,7 @@ router.post('/', validateRequest(createTaskSchema), (req, res) => {
     id: nextId++,
     ...taskData,
     created: new Date(),
-    updated: new Date()
+    updated: new Date(),
   };
 
   tasks.push(newTask);
@@ -133,21 +133,21 @@ router.post('/', validateRequest(createTaskSchema), (req, res) => {
 
   res.status(201).json({
     message: 'Tâche créée avec succès',
-    data: newTask
+    data: newTask,
   });
 });
 
 // PUT /api/tasks/:id - Mettre à jour une tâche
 router.put('/:id', validateRequest(updateTaskSchema), (req, res) => {
   const id = parseInt(req.params.id);
-  const taskIndex = tasks.findIndex(t => t.id === id);
+  const taskIndex = tasks.findIndex((t) => t.id === id);
 
   if (taskIndex === -1) {
     return res.status(404).json({
       error: {
         message: 'Tâche non trouvée',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -156,27 +156,27 @@ router.put('/:id', validateRequest(updateTaskSchema), (req, res) => {
   tasks[taskIndex] = {
     ...tasks[taskIndex],
     ...updatedData,
-    updated: new Date()
+    updated: new Date(),
   };
 
   logger.info(`Tâche mise à jour: ID ${id}`);
   res.json({
     message: 'Tâche mise à jour avec succès',
-    data: tasks[taskIndex]
+    data: tasks[taskIndex],
   });
 });
 
 // DELETE /api/tasks/:id - Supprimer une tâche
 router.delete('/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const taskIndex = tasks.findIndex(t => t.id === id);
+  const taskIndex = tasks.findIndex((t) => t.id === id);
 
   if (taskIndex === -1) {
     return res.status(404).json({
       error: {
         message: 'Tâche non trouvée',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -185,7 +185,7 @@ router.delete('/:id', (req, res) => {
 
   res.json({
     message: 'Tâche supprimée avec succès',
-    data: deletedTask
+    data: deletedTask,
   });
 });
 
@@ -201,19 +201,19 @@ router.patch('/:id/status', (req, res) => {
       error: {
         message: 'Statut invalide',
         validStatuses,
-        statusCode: 400
-      }
+        statusCode: 400,
+      },
     });
   }
 
-  const taskIndex = tasks.findIndex(t => t.id === id);
+  const taskIndex = tasks.findIndex((t) => t.id === id);
 
   if (taskIndex === -1) {
     return res.status(404).json({
       error: {
         message: 'Tâche non trouvée',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -225,7 +225,7 @@ router.patch('/:id/status', (req, res) => {
 
   res.json({
     message: 'Statut de la tâche mis à jour avec succès',
-    data: tasks[taskIndex]
+    data: tasks[taskIndex],
   });
 });
 

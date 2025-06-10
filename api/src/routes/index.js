@@ -12,12 +12,12 @@ router.get('/', (req, res) => {
     endpoints: {
       users: '/api/users',
       tasks: '/api/tasks',
-      health: '/health'
+      health: '/health',
     },
     documentation: {
       swagger: '/api/docs',
-      postman: '/api/postman'
-    }
+      postman: '/api/postman',
+    },
   });
 });
 
@@ -34,7 +34,7 @@ router.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
@@ -47,24 +47,24 @@ router.get('/docs', (req, res) => {
       {
         path: '/api/users',
         methods: ['GET', 'POST'],
-        description: 'Gestion des utilisateurs'
+        description: 'Gestion des utilisateurs',
       },
       {
         path: '/api/users/:id',
         methods: ['GET', 'PUT', 'DELETE'],
-        description: 'Opérations sur un utilisateur spécifique'
+        description: 'Opérations sur un utilisateur spécifique',
       },
       {
         path: '/api/tasks',
         methods: ['GET', 'POST'],
-        description: 'Gestion des tâches'
+        description: 'Gestion des tâches',
       },
       {
         path: '/api/tasks/:id',
         methods: ['GET', 'PUT', 'DELETE'],
-        description: 'Opérations sur une tâche spécifique'
-      }
-    ]
+        description: 'Opérations sur une tâche spécifique',
+      },
+    ],
   });
 });
 

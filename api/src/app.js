@@ -13,7 +13,7 @@ const {
   detailedHealthCheck,
   getMetricsPrometheus,
   livenessProbe,
-  readinessProbe
+  readinessProbe,
 } = require('../../monitoring/health-checks');
 
 const app = express();
@@ -28,13 +28,13 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: {
-    error: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'
-  }
+    error: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.',
+  },
 });
 app.use(limiter);
 
 // Logging middleware
-app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
+app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -52,7 +52,7 @@ app.get('/health', async (req, res) => {
     res.status(503).json({
       status: 'ERROR',
       message: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -76,7 +76,7 @@ app.get('/', (req, res) => {
     message: "Bienvenue sur l'API d'évaluation CI/CD",
     version: '1.0.0',
     documentation: '/api/docs',
-    health: '/health'
+    health: '/health',
   });
 });
 

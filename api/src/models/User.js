@@ -28,7 +28,7 @@ class User {
       email: this.email,
       role: this.role,
       created: this.created,
-      updated: this.updated
+      updated: this.updated,
     };
   }
 
@@ -66,7 +66,7 @@ class User {
       ...data,
       id: data.id || Date.now(), // ID temporaire si pas fourni
       created: new Date(),
-      updated: new Date()
+      updated: new Date(),
     });
   }
 }

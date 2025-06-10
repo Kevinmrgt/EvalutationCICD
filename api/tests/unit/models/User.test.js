@@ -7,7 +7,7 @@ describe('User Model', () => {
         id: 1,
         name: 'John Doe',
         email: 'john@example.com',
-        role: 'admin'
+        role: 'admin',
       };
 
       const user = new User(userData);
@@ -22,7 +22,7 @@ describe('User Model', () => {
       const userData = {
         id: 1,
         name: 'Jane Doe',
-        email: 'jane@example.com'
+        email: 'jane@example.com',
       };
 
       const user = new User(userData);
@@ -47,7 +47,7 @@ describe('User Model', () => {
         const userData = {
           name: 'New User',
           email: 'new@example.com',
-          role: 'admin'
+          role: 'admin',
         };
 
         const user = User.create(userData);
@@ -59,7 +59,7 @@ describe('User Model', () => {
 
       it('should throw error if name is missing', () => {
         const userData = {
-          email: 'test@example.com'
+          email: 'test@example.com',
         };
 
         expect(() => User.create(userData)).toThrow("Le nom et l'email sont requis");
@@ -75,7 +75,7 @@ describe('User Model', () => {
         id: 1,
         name: 'Test User',
         email: 'test@example.com',
-        role: 'user'
+        role: 'user',
       });
     });
 
