@@ -10,7 +10,7 @@ describe('Tasks API Routes', () => {
 
   afterAll(async () => {
     if (server) {
-      await new Promise(resolve => server.close(resolve));
+      await new Promise((resolve) => server.close(resolve));
     }
   });
 
@@ -51,7 +51,7 @@ describe('Tasks API Routes', () => {
         title: 'New Test Task',
         description: 'This is a new test task',
         status: 'pending',
-        priority: 'high'
+        priority: 'high',
       };
 
       const response = await request(app).post('/api/tasks').send(newTask).expect(201);
@@ -62,7 +62,7 @@ describe('Tasks API Routes', () => {
 
     it('should return 400 for missing required fields', async () => {
       const incompleteTask = {
-        title: 'Missing Description'
+        title: 'Missing Description',
       };
 
       const response = await request(app).post('/api/tasks').send(incompleteTask).expect(400);
@@ -77,7 +77,7 @@ describe('Tasks API Routes', () => {
     beforeEach(async () => {
       const task = {
         title: 'Update Test Task',
-        description: 'Task for update testing'
+        description: 'Task for update testing',
       };
 
       const response = await request(app).post('/api/tasks').send(task).expect(201);
@@ -86,7 +86,7 @@ describe('Tasks API Routes', () => {
 
     it('should update task successfully', async () => {
       const updates = {
-        title: 'Updated Task Title'
+        title: 'Updated Task Title',
       };
 
       const response = await request(app).put(`/api/tasks/${createdTaskId}`).send(updates).expect(200);
@@ -101,7 +101,7 @@ describe('Tasks API Routes', () => {
     beforeEach(async () => {
       const task = {
         title: 'Delete Test Task',
-        description: 'Task for deletion testing'
+        description: 'Task for deletion testing',
       };
 
       const response = await request(app).post('/api/tasks').send(task).expect(201);

@@ -12,7 +12,7 @@ describe('Users API Routes', () => {
   afterAll(async () => {
     // Fermer le serveur après les tests
     if (server) {
-      await new Promise(resolve => server.close(resolve));
+      await new Promise((resolve) => server.close(resolve));
     }
   });
 
@@ -46,7 +46,7 @@ describe('Users API Routes', () => {
       const newUser = {
         name: 'Test User',
         email: 'test@example.com',
-        role: 'user'
+        role: 'user',
       };
 
       const response = await request(app).post('/api/users').send(newUser).expect(201);
@@ -57,7 +57,7 @@ describe('Users API Routes', () => {
 
     it('should return 400 for missing required fields', async () => {
       const incompleteUser = {
-        name: 'Missing Email'
+        name: 'Missing Email',
       };
 
       const response = await request(app).post('/api/users').send(incompleteUser).expect(400);
@@ -73,7 +73,7 @@ describe('Users API Routes', () => {
       const user = {
         name: 'Update Test User',
         email: 'update@example.com',
-        role: 'user'
+        role: 'user',
       };
 
       const response = await request(app).post('/api/users').send(user).expect(201);
@@ -82,7 +82,7 @@ describe('Users API Routes', () => {
 
     it('should update user successfully', async () => {
       const updates = {
-        name: 'Updated Name'
+        name: 'Updated Name',
       };
 
       const response = await request(app).put(`/api/users/${createdUserId}`).send(updates).expect(200);
@@ -98,7 +98,7 @@ describe('Users API Routes', () => {
       const user = {
         name: 'Delete Test User',
         email: 'delete@example.com',
-        role: 'user'
+        role: 'user',
       };
 
       const response = await request(app).post('/api/users').send(user).expect(201);

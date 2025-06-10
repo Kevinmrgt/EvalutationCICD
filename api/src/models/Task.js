@@ -41,7 +41,7 @@ class Task {
       created: this.created,
       updated: this.updated,
       isOverdue: this.isOverdue(),
-      daysSinceCreated: this.getDaysSinceCreated()
+      daysSinceCreated: this.getDaysSinceCreated(),
     };
   }
 
@@ -82,7 +82,7 @@ class Task {
     return {
       oldStatus,
       newStatus,
-      timestamp: this.updated
+      timestamp: this.updated,
     };
   }
 
@@ -118,7 +118,7 @@ class Task {
       low: '#28a745', // Vert
       medium: '#ffc107', // Jaune
       high: '#fd7e14', // Orange
-      urgent: '#dc3545' // Rouge
+      urgent: '#dc3545', // Rouge
     };
     return colors[this.priority] || colors.medium;
   }
@@ -141,7 +141,7 @@ class Task {
       ...data,
       id: data.id || Date.now(), // ID temporaire si pas fourni
       created: new Date(),
-      updated: new Date()
+      updated: new Date(),
     });
   }
 
@@ -150,19 +150,19 @@ class Task {
     let filteredTasks = [...tasks];
 
     if (filters.status) {
-      filteredTasks = filteredTasks.filter(task => task.status === filters.status);
+      filteredTasks = filteredTasks.filter((task) => task.status === filters.status);
     }
 
     if (filters.priority) {
-      filteredTasks = filteredTasks.filter(task => task.priority === filters.priority);
+      filteredTasks = filteredTasks.filter((task) => task.priority === filters.priority);
     }
 
     if (filters.assignedTo) {
-      filteredTasks = filteredTasks.filter(task => task.assignedTo === filters.assignedTo);
+      filteredTasks = filteredTasks.filter((task) => task.assignedTo === filters.assignedTo);
     }
 
     if (filters.overdue === true) {
-      filteredTasks = filteredTasks.filter(task => task.isOverdue());
+      filteredTasks = filteredTasks.filter((task) => task.isOverdue());
     }
 
     return filteredTasks;

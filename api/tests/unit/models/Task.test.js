@@ -8,7 +8,7 @@ describe('Task Model', () => {
         title: 'Test Task',
         description: 'This is a test task',
         status: 'in-progress',
-        priority: 'high'
+        priority: 'high',
       };
 
       const task = new Task(taskData);
@@ -24,7 +24,7 @@ describe('Task Model', () => {
       const taskData = {
         id: 1,
         title: 'Simple Task',
-        description: 'Simple description'
+        description: 'Simple description',
       };
 
       const task = new Task(taskData);
@@ -52,7 +52,7 @@ describe('Task Model', () => {
           title: 'New Task',
           description: 'This is a new task',
           status: 'pending',
-          priority: 'high'
+          priority: 'high',
         };
 
         const task = Task.create(taskData);
@@ -64,7 +64,7 @@ describe('Task Model', () => {
 
       it('should throw error if title is missing', () => {
         const taskData = {
-          description: 'Description without title'
+          description: 'Description without title',
         };
 
         expect(() => Task.create(taskData)).toThrow('Le titre et la description sont requis');
@@ -81,7 +81,7 @@ describe('Task Model', () => {
         title: 'Test Task',
         description: 'Test description',
         status: 'pending',
-        priority: 'medium'
+        priority: 'medium',
       });
     });
 

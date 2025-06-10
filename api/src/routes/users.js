@@ -7,7 +7,7 @@ const { validateRequest } = require('../middleware/errorMiddleware');
 // Simulation d'une base de données en mémoire
 const users = [
   { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin', created: new Date() },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'user', created: new Date() }
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'user', created: new Date() },
 ];
 let nextId = 3;
 
@@ -15,13 +15,13 @@ let nextId = 3;
 const createUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
-  role: Joi.string().valid('admin', 'user').default('user')
+  role: Joi.string().valid('admin', 'user').default('user'),
 });
 
 const updateUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   email: Joi.string().email().optional(),
-  role: Joi.string().valid('admin', 'user').optional()
+  role: Joi.string().valid('admin', 'user').optional(),
 });
 
 // GET /api/users - Récupérer tous les utilisateurs
@@ -34,7 +34,7 @@ router.get('/', (req, res) => {
 
   // Filtrage par rôle si spécifié
   if (role) {
-    filteredUsers = users.filter(user => user.role === role);
+    filteredUsers = users.filter((user) => user.role === role);
   }
 
   // Pagination
@@ -49,23 +49,23 @@ router.get('/', (req, res) => {
       totalPages: Math.ceil(filteredUsers.length / limit),
       totalUsers: filteredUsers.length,
       hasNext: endIndex < filteredUsers.length,
-      hasPrev: startIndex > 0
-    }
+      hasPrev: startIndex > 0,
+    },
   });
 });
 
 // GET /api/users/:id - Récupérer un utilisateur par ID
 router.get('/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const user = users.find(u => u.id === id);
+  const user = users.find((u) => u.id === id);
 
   if (!user) {
     logger.warn(`Utilisateur non trouvé: ID ${id}`);
     return res.status(404).json({
       error: {
         message: 'Utilisateur non trouvé',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -78,13 +78,13 @@ router.post('/', validateRequest(createUserSchema), (req, res) => {
   const { name, email, role = 'user' } = req.validatedBody;
 
   // Vérifier si l'email existe déjà
-  const existingUser = users.find(u => u.email === email);
+  const existingUser = users.find((u) => u.email === email);
   if (existingUser) {
     return res.status(409).json({
       error: {
         message: 'Un utilisateur avec cet email existe déjà',
-        statusCode: 409
-      }
+        statusCode: 409,
+      },
     });
   }
 
@@ -94,7 +94,7 @@ router.post('/', validateRequest(createUserSchema), (req, res) => {
     email,
     role,
     created: new Date(),
-    updated: new Date()
+    updated: new Date(),
   };
 
   users.push(newUser);
@@ -102,21 +102,21 @@ router.post('/', validateRequest(createUserSchema), (req, res) => {
 
   res.status(201).json({
     message: 'Utilisateur créé avec succès',
-    data: newUser
+    data: newUser,
   });
 });
 
 // PUT /api/users/:id - Mettre à jour un utilisateur
 router.put('/:id', validateRequest(updateUserSchema), (req, res) => {
   const id = parseInt(req.params.id);
-  const userIndex = users.findIndex(u => u.id === id);
+  const userIndex = users.findIndex((u) => u.id === id);
 
   if (userIndex === -1) {
     return res.status(404).json({
       error: {
         message: 'Utilisateur non trouvé',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -124,13 +124,13 @@ router.put('/:id', validateRequest(updateUserSchema), (req, res) => {
 
   // Vérifier si le nouvel email existe déjà (si modifié)
   if (updatedData.email) {
-    const existingUser = users.find(u => u.email === updatedData.email && u.id !== id);
+    const existingUser = users.find((u) => u.email === updatedData.email && u.id !== id);
     if (existingUser) {
       return res.status(409).json({
         error: {
           message: 'Un utilisateur avec cet email existe déjà',
-          statusCode: 409
-        }
+          statusCode: 409,
+        },
       });
     }
   }
@@ -138,27 +138,27 @@ router.put('/:id', validateRequest(updateUserSchema), (req, res) => {
   users[userIndex] = {
     ...users[userIndex],
     ...updatedData,
-    updated: new Date()
+    updated: new Date(),
   };
 
   logger.info(`Utilisateur mis à jour: ID ${id}`);
   res.json({
     message: 'Utilisateur mis à jour avec succès',
-    data: users[userIndex]
+    data: users[userIndex],
   });
 });
 
 // DELETE /api/users/:id - Supprimer un utilisateur
 router.delete('/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const userIndex = users.findIndex(u => u.id === id);
+  const userIndex = users.findIndex((u) => u.id === id);
 
   if (userIndex === -1) {
     return res.status(404).json({
       error: {
         message: 'Utilisateur non trouvé',
-        statusCode: 404
-      }
+        statusCode: 404,
+      },
     });
   }
 
@@ -167,7 +167,7 @@ router.delete('/:id', (req, res) => {
 
   res.json({
     message: 'Utilisateur supprimé avec succès',
-    data: deletedUser
+    data: deletedUser,
   });
 });
 
