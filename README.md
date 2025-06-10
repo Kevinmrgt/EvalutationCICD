@@ -76,6 +76,9 @@ EvaluationCICD/
 - Node.js >= 18.0.0
 - npm >= 9.0.0
 - Docker (optionnel)
+- **Terraform >= 1.0** (pour l'infrastructure cloud)
+- **Ansible >= 2.9** (pour l'automatisation)
+- **AWS CLI** configuré (pour le déploiement)
 
 ### Installation
 ```bash
@@ -102,6 +105,12 @@ npm start
 # Avec Docker
 npm run docker:build
 npm run docker:run
+
+# Déploiement Infrastructure (Terraform + Ansible)
+./scripts/deploy.sh init              # Initialiser le projet
+./scripts/deploy.sh plan              # Planifier le déploiement  
+./scripts/deploy.sh deploy            # Déployer l'infrastructure complète
+./scripts/deploy.sh status            # Voir le statut
 ```
 
 ## 📡 API Endpoints
@@ -161,14 +170,80 @@ npm run format:check
 - [x] Gestion d'erreurs centralisée
 - [x] Variables d'environnement
 
+### ✅ Infrastructures et Automatisation (TERMINÉES)
+- [x] **Infrastructure as Code avec Terraform**
+  - [x] Configuration VPC, subnets, security groups
+  - [x] Auto Scaling Group avec Load Balancer
+  - [x] Instance RDS PostgreSQL (optionnelle)
+  - [x] CloudWatch monitoring intégré
+  - [x] Gestion multi-environnements
+
+- [x] **Automatisation avec Ansible**
+  - [x] Configuration automatisée des serveurs
+  - [x] Rôles modulaires (common, nodejs, security, monitoring)
+  - [x] Déploiement automatisé de l'application
+  - [x] Gestion des secrets et variables d'environnement
+  - [x] Health checks et rollback automatique
+
 ### 🔄 Prochaines Étapes
 - [ ] **Étape 2** - Tests unitaires et d'intégration
-- [ ] **Étape 3** - Configuration Docker
-- [ ] **Étape 4** - Scripts Terraform
-- [ ] **Étape 5** - Playbooks Ansible
-- [ ] **Étape 6** - Pipeline GitHub Actions
-- [ ] **Étape 7** - Monitoring et alertes
-- [ ] **Étape 8** - Snapshots et rollback
+- [ ] **Étape 3** - Configuration Docker avancée
+- [ ] **Étape 6** - Pipeline GitHub Actions complet
+- [ ] **Étape 7** - Monitoring et alertes avancés
+- [ ] **Étape 8** - Snapshots et rollback améliorés
+
+## 🏗️ Infrastructure as Code
+
+### 🔧 Terraform - Gestion de l'Infrastructure
+
+```bash
+# Initialiser Terraform
+cd terraform
+terraform init
+
+# Configurer les variables
+cp terraform.tfvars.example terraform.tfvars
+# Éditer terraform.tfvars avec vos valeurs
+
+# Planifier le déploiement
+terraform plan
+
+# Déployer l'infrastructure
+terraform apply
+
+# Voir les outputs (URLs, IPs, etc.)
+terraform output
+```
+
+### 🔧 Ansible - Configuration des Serveurs
+
+```bash
+# Configurer l'inventaire
+cd ansible
+cp inventory/hosts.yml.example inventory/hosts.yml
+# Éditer hosts.yml avec vos serveurs
+
+# Tester la connectivité
+ansible all -m ping
+
+# Déployer la configuration complète
+ansible-playbook playbooks/site.yml
+
+# Déployer seulement l'application
+ansible-playbook playbooks/deploy.yml -e "app_version=v1.2.3"
+```
+
+### 🚀 Script de Déploiement Unifié
+
+```bash
+# Utiliser le script tout-en-un pour simplifier les opérations
+./scripts/deploy.sh --help                    # Voir l'aide
+./scripts/deploy.sh init                      # Initialiser
+./scripts/deploy.sh deploy -e staging         # Déployer en staging
+./scripts/deploy.sh deploy -e prod -v v1.2.3  # Déployer version spécifique
+./scripts/deploy.sh status                    # Voir le statut
+./scripts/deploy.sh destroy -e dev --force    # Détruire l'environnement dev
+```
 
 ## 🔧 Configuration
 

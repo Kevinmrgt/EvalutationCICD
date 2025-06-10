@@ -88,14 +88,27 @@ Je vais analyser le document PDF pour comprendre les exigences du projet, puis l
     - Variables d'environnement sécurisées
     - Policies de sécurité
 
-### **Phase 8 : Optimisations avancées**
-14. **Performance et optimisation**
+### **Phase 8 : Infrastructure as Code et Automatisation**
+14. **Infrastructure as Code avec Terraform**
+    - Configuration de l'infrastructure AWS (VPC, EC2, ALB, RDS)
+    - Gestion des états et environments multiples
+    - Modules réutilisables et bonnes pratiques
+    - Intégration avec GitHub Actions
+
+15. **Automatisation de configuration avec Ansible**
+    - Playbooks pour la configuration des serveurs
+    - Rôles modulaires (common, nodejs, security, monitoring)
+    - Déploiement automatisé de l'application
+    - Gestion des secrets et variables d'environnement
+
+### **Phase 9 : Optimisations avancées**
+16. **Performance et optimisation**
     - Cache des dépendances
     - Optimisation des builds
     - Parallel jobs dans les workflows
     - Stratégies de déploiement (blue-green, canary)
 
-15. **Intégrations tierces**
+17. **Intégrations tierces**
     - Notifications Slack/Discord
     - Intégration avec des registries
     - Déploiement sur cloud providers
@@ -119,6 +132,28 @@ EvaluationCICD/
 ├── tests/
 │   ├── unit/
 │   └── integration/
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── user-data.sh
+│   ├── terraform.tfvars.example
+│   └── README.md
+├── ansible/
+│   ├── ansible.cfg
+│   ├── inventory/
+│   │   └── hosts.yml
+│   ├── playbooks/
+│   │   ├── site.yml
+│   │   └── tasks/
+│   ├── roles/
+│   │   ├── common/
+│   │   ├── nodejs/
+│   │   ├── security/
+│   │   └── monitoring/
+│   └── README.md
+├── scripts/
+│   └── deploy.sh
 ├── docs/
 ├── Dockerfile
 ├── docker-compose.yml
@@ -135,9 +170,11 @@ EvaluationCICD/
 - ✅ Linting et formatage automatique
 - ✅ Containerisation Docker
 - ✅ CI/CD complet avec GitHub Actions
-- ✅ Déploiement automatisé
-- ✅ Monitoring et logs
+- ✅ **Infrastructure as Code avec Terraform**
+- ✅ **Automatisation de configuration avec Ansible**
+- ✅ Déploiement automatisé multi-environnements
+- ✅ Monitoring et logs centralisés
 - ✅ Documentation complète
-- ✅ Sécurité intégrée
+- ✅ Sécurité intégrée et bonnes pratiques
 
 Veux-tu que je commence par une étape spécifique ou que je procède dans l'ordre avec la première phase ?
