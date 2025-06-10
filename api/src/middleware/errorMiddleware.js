@@ -11,7 +11,7 @@ const notFound = (req, res, next) => {
 // Middleware de gestion des erreurs
 const errorHandler = (err, req, res, _next) => {
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-  
+
   // Log de l'erreur
   logger.error('Erreur serveur:', {
     message: err.message,
@@ -24,7 +24,7 @@ const errorHandler = (err, req, res, _next) => {
   });
 
   res.status(statusCode);
-  
+
   const errorResponse = {
     message: err.message,
     statusCode,
@@ -44,10 +44,10 @@ const errorHandler = (err, req, res, _next) => {
 };
 
 // Middleware de validation des données
-const validateRequest = (schema) => {
+const validateRequest = schema => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req.body);
-    
+
     if (error) {
       logger.warn('Validation error:', {
         details: error.details,
@@ -55,7 +55,7 @@ const validateRequest = (schema) => {
         method: req.method,
         body: req.body
       });
-      
+
       return res.status(400).json({
         error: {
           message: 'Données de requête invalides',
@@ -68,7 +68,7 @@ const validateRequest = (schema) => {
         }
       });
     }
-    
+
     req.validatedBody = value;
     next();
   };
@@ -78,4 +78,4 @@ module.exports = {
   notFound,
   errorHandler,
   validateRequest
-}; 
+};

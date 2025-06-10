@@ -7,7 +7,7 @@ const tasksRoutes = require('./tasks');
 // Documentation de l'API
 router.get('/', (req, res) => {
   res.json({
-    message: 'API d\'évaluation CI/CD',
+    message: "API d'évaluation CI/CD",
     version: '1.0.0',
     endpoints: {
       users: '/api/users',
@@ -26,6 +26,17 @@ router.use('/users', usersRoutes);
 
 // Routes pour les tâches
 router.use('/tasks', tasksRoutes);
+
+// Health check endpoint
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // Endpoint de documentation
 router.get('/docs', (req, res) => {
