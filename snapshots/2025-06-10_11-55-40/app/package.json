@@ -1,0 +1,65 @@
+{
+  "name": "evalutationcicd",
+  "version": "1.0.0",
+  "description": "Projet d'évaluation CI/CD - API REST avec pipeline complet de déploiement automatisé",
+  "main": "api/src/app.js",
+  "scripts": {
+    "start": "node api/src/app.js",
+    "dev": "nodemon api/src/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint api/src api/tests",
+    "lint:fix": "eslint api/src api/tests --fix",
+    "format": "prettier --write api/src api/tests",
+    "format:check": "prettier --check api/src api/tests",
+    "build": "npm run lint && npm run test",
+    "docker:build": "docker build -t evalutationcicd:latest .",
+    "docker:run": "docker run -p 3000:3000 evalutationcicd:latest",
+    "docker:dev": "docker-compose up --build",
+    "test:api": "node test-api.js",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "api",
+    "cicd",
+    "devops",
+    "terraform",
+    "ansible",
+    "github-actions"
+  ],
+  "author": "Kevin - Evaluation YNOV DevOps",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "express-rate-limit": "^7.1.5",
+    "joi": "^17.11.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.2",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
