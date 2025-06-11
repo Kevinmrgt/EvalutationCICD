@@ -24,10 +24,6 @@ monitoring/logs/
 # Git
 .git/
 
-# Docker
-Dockerfile
-docker-compose.yml
-
 # Terraform
 *.tfstate
 *.tfvars

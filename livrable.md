@@ -30,7 +30,7 @@
 
 ### a. README.md complet et structuré ✅
 - ✅ **Présentation du projet** : Contexte de l'API et application mobile documenté
-- ✅ **Technologies utilisées** : Node.js, Express, Docker, GitHub Actions, Terraform, Ansible
+- ✅ **Technologies utilisées** : Node.js, Express, GitHub Actions, Terraform, Ansible
 - ✅ **Documentation complète** : 374 lignes, bien structurée
 - 📁 **Fichier** : `README.md` (14KB)
 
@@ -68,10 +68,12 @@
 - ✅ **Monitoring avancé** : Endpoints /health, /metrics
 - 📁 **Dossiers** : `coverage/`, `monitoring/`
 
-### g. Captures d'écran ⚠️ **À RÉALISER**
-- ❌ **Manquant** : Captures d'écran obligatoires avec légende
-- 🎯 **Actions requises** :
+### g. Captures d'écran ⚠️ 
+
   1. Exécution complète du pipeline CI/CD
+
+
+  
   2. Interface de staging déployée
   3. Interface de production déployée
   4. Vue des branches Git
@@ -173,6 +175,22 @@ EvaluationCICD/                     ✅ Racine du projet
 - ✅ **Guides utilisateur** : Installation, déploiement, usage
 - ✅ **Bonnes pratiques** : Sécurité, maintenance, troubleshooting
 - 📁 **Fichiers** : `README.md`, `docs/`, documentation distribuée
+
+---
+
+## 🚀 Technologies utilisées
+
+- ✅ **Node.js** (v18+) - Runtime JavaScript
+- ✅ **Express.js** - Framework web rapide et minimaliste
+- ✅ **Jest** - Framework de tests avec couverture de code
+- ✅ **ESLint + Prettier** - Qualité et formatage du code
+- ✅ **Winston** - Logging professionnel avec rotation
+- ✅ **Terraform** - Infrastructure as Code (AWS)
+- ✅ **Ansible** - Configuration management
+- ✅ **GitHub Actions** - Pipeline CI/CD automatisé
+
+**Choix techniques justifiés :**
+- ✅ **Technologies utilisées** : Node.js, Express, GitHub Actions, Terraform, Ansible
 
 ---
 

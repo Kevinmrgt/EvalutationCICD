@@ -57,9 +57,6 @@ Thumbs.db
 dist/
 build/
 
-# Docker
-.dockerignore
-
 # Terraform
 *.tfstate
 *.tfstate.*
@@ -79,6 +76,7 @@ monitoring/logs/
 # Snapshots
 snapshots/data/
 snapshots/backups/
+snapshots/*.tar.gz
 
 # Secrets and keys
 *.pem

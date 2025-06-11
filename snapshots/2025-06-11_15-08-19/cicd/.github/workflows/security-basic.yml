@@ -80,3 +80,49 @@ jobs:
             security-report.md
             npm-audit.json
           if-no-files-found: ignore
+
+  # ==========================================
+  # Job 2: Dockerfile Lint
+  # ==========================================
+  dockerfile-lint:
+    name: 🐳 Dockerfile Security Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Install hadolint
+        run: |
+          wget -O hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          chmod +x hadolint
+          sudo mv hadolint /usr/local/bin/
+
+      - name: 🔍 Scan Dockerfile
+        run: |
+          echo "🔍 Scanning Dockerfile..."
+          hadolint Dockerfile || echo "⚠️ Hadolint found issues"
+
+          echo "🔍 Scanning Dockerfile.prod..."
+          hadolint Dockerfile.prod || echo "⚠️ Hadolint found issues in Dockerfile.prod"
+
+          echo "🔍 Scanning Dockerfile.dev..."
+          hadolint Dockerfile.dev || echo "⚠️ Hadolint found issues in Dockerfile.dev"
+
+      - name: 📋 Generate Dockerfile Report
+        run: |
+          echo "# 🐳 Dockerfile Security Report" > dockerfile-report.md
+          echo "" >> dockerfile-report.md
+          echo "## 📊 Files Scanned" >> dockerfile-report.md
+          echo "" >> dockerfile-report.md
+          echo "- Dockerfile" >> dockerfile-report.md
+          echo "- Dockerfile.prod" >> dockerfile-report.md
+          echo "- Dockerfile.dev" >> dockerfile-report.md
+          echo "" >> dockerfile-report.md
+          echo "Generated on: $(date)" >> dockerfile-report.md
+
+      - name: 📊 Upload Dockerfile Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dockerfile-security-report
+          path: dockerfile-report.md

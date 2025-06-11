@@ -26,8 +26,6 @@ cp "${PROJECT_ROOT}/package-lock.json" "${SNAPSHOT_DIR}/app/" 2>/dev/null || tru
 
 # 2. Snapshot de la configuration
 echo "⚙️ Sauvegarde de la configuration..."
-cp "${PROJECT_ROOT}/Dockerfile"* "${SNAPSHOT_DIR}/config/" 2>/dev/null || true
-cp "${PROJECT_ROOT}/docker-compose.yml" "${SNAPSHOT_DIR}/config/" 2>/dev/null || true
 cp "${PROJECT_ROOT}/.env"* "${SNAPSHOT_DIR}/config/" 2>/dev/null || true
 cp "${PROJECT_ROOT}/env.example" "${SNAPSHOT_DIR}/config/" 2>/dev/null || true
 

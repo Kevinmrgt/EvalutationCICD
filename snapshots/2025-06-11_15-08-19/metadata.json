@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-06-11_15-08-19",
+  "date": "mer. 11 juin 2025 15:08:19 CEST",
+  "git_commit": "b16009f5249f54c925c774c40bb3cfe89e4349d1",
+  "git_branch": "main",
+  "git_tag": "aucun-tag",
+  "snapshot_size": "672M",
+  "components": {
+    "application": "inclus",
+    "configuration": "inclus",
+    "infrastructure": "inclus",
+    "cicd": "inclus"
+  }
+}

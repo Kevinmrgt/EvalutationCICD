@@ -1,399 +1,246 @@
-# 🚀 Projet d'Évaluation CI/CD - API REST Node.js
+# EvaluationCICD
 
-[![CI Tests](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/ci.yml/badge.svg)](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/ci.yml)
-[![CD Deploy](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/cd.yml/badge.svg)](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/cd.yml)
-[![Security Scan](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/security.yml/badge.svg)](https://github.com/Kevinmrgt/EvalutationCICD/actions/workflows/security.yml)
-[![Docker Build](https://img.shields.io/docker/cloud/build/kevinmrgt/evalutationcicd)](https://hub.docker.com/r/kevinmrgt/evalutationcicd)
-[![Node.js Version](https://img.shields.io/node/v/evalutationcicd)](https://nodejs.org/)
-[![License](https://img.shields.io/github/license/Kevinmrgt/EvalutationCICD)](./LICENSE)
+[![CI](https://github.com/kevinmrgt/evalutationcicd/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinmrgt/evalutationcicd/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/kevinmrgt/evalutationcicd/branch/main/graph/badge.svg)](https://codecov.io/gh/kevinmrgt/evalutationcicd)
+[![Security](https://github.com/kevinmrgt/evalutationcicd/actions/workflows/security.yml/badge.svg)](https://github.com/kevinmrgt/evalutationcicd/actions/workflows/security.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🎯 **STATUT : PROJET TERMINÉ - SCORE PARFAIT 20/20** ✅
+> **Projet d'évaluation CI/CD** - API REST Node.js avec pipeline de déploiement automatisé
 
-> **Objectif atteint !** Ce projet d'évaluation CI/CD a obtenu le score parfait de **20/20 points** en respectant tous les critères d'évaluation YNOV DevOps.
+## 🎯 Description
 
-## 📋 Description du Projet
+Ce projet démontre la mise en place d'un pipeline CI/CD complet pour une application Node.js, incluant les bonnes pratiques DevOps, la sécurité, et l'automatisation.
 
-Ce projet fait partie d'une évaluation complète de mise en œuvre d'un pipeline CI/CD. Il s'agit d'une API REST Node.js destinée à une application mobile, avec une infrastructure DevOps complète incluant :
+### 🚀 **Fonctionnalités**
 
-- ✅ **Infrastructure as Code** avec Terraform (3/3 pts)
-- ✅ **Configuration automatisée** avec Ansible (3/3 pts)
-- ✅ **Pipeline CI/CD complet** avec GitHub Actions (3/3 pts)
-- ✅ **GitFlow structuré** avec versionnement sémantique (2/2 pts)
-- ✅ **Monitoring et health checks** avancés (2/2 pts)
-- ✅ **Système de snapshots** automatisé (2/2 pts)
-- ✅ **Stratégies de rollback** sécurisées (2/2 pts)
-- ✅ **Versionnement sémantique** automatisé (1/1 pt)
-- ✅ **Documentation complète** (2/2 pts)
+- **API REST** - Express.js avec endpoints CRUD pour utilisateurs et tâches
+- **Tests automatisés** - Tests unitaires et d'intégration avec Jest (couverture >70%)
+- **Qualité de code** - ESLint, Prettier, et hooks pre-commit
+- **Pipeline CI/CD** - GitHub Actions avec déploiement automatisé
+- **Monitoring** - Health checks, métriques Prometheus, logs structurés
+- **Sécurité** - Scans de vulnérabilités, audit npm, analyse de code
+- **Infrastructure as Code** - Terraform et Ansible
+- **Snapshots** - Sauvegarde et rollback automatisés
+- **Versionnement sémantique** - Tags automatiques et releases GitHub
 
-## 🏗️ Technologies Utilisées
+### 🛠 **Stack Technique**
 
-### Backend
-- **Node.js** (v18+) - Runtime JavaScript
-- **Express.js** - Framework web
-- **Winston** - Logging avancé
-- **Joi** - Validation des données
-- **Jest** - Tests unitaires et d'intégration
-- **Helmet** - Sécurité HTTP
-- **CORS** - Gestion des requêtes cross-origin
+- **Backend** : Node.js 18+, Express.js
+- **Tests** : Jest, Supertest
+- **Qualité** : ESLint, Prettier, Husky
+- **CI/CD** : GitHub Actions
+- **Infrastructure** : Terraform, Ansible
+- **Monitoring** : Winston, métriques custom
+- **Sécurité** : Snyk, CodeQL, Semgrep
 
-### DevOps & Infrastructure
-- **Docker** - Containerisation avec multi-stage builds
-- **Terraform** - Infrastructure as Code (AWS VPC, EC2, ALB, RDS)
-- **Ansible** - Configuration management avec rôles modulaires
-- **GitHub Actions** - Pipeline CI/CD automatisé
-- **ESLint + Prettier** - Qualité de code automatisée
+## 📊 Métriques du Projet
 
-### Monitoring & Observabilité
-- **Winston** - Logs structurés avec rotation
-- **Morgan** - Logs HTTP détaillés
-- **Prometheus** - Métriques exportées (/metrics)
-- **Health Checks** - Endpoints Kubernetes-style
-- **Express Rate Limit** - Protection DDoS
+### 🧪 Tests et Couverture
+- **Tests unitaires** : 22 tests passent ✅
+- **Tests d'intégration** : 9 tests passent ✅  
+- **Couverture globale** : 70.77% 📊
+- **Seuils configurés** : Statements 70%, Branches 65%, Functions 70%, Lines 70%
 
-## 🏷️ Versionnement Sémantique
+### 🚀 Pipeline CI/CD
+- **Workflows actifs** : 5 workflows GitHub Actions
+- **Checks automatiques** : Linting, tests, sécurité, déploiement
+- **Environnements** : Staging → Production avec approbation manuelle
+- **Releases** : Automatiques via tags Git (dernière : v1.1.1)
 
-Ce projet utilise le [versionnement sémantique (SemVer)](https://semver.org/) pour gérer les releases :
+### 🔒 Sécurité
+- **Scans de vulnérabilités** : npm audit, Snyk, CodeQL
+- **Détection de secrets** : TruffleHog, GitLeaks
+- **Analyse statique** : ESLint security rules, Semgrep
 
-- **MAJOR** (1.0.0 → 2.0.0) : Changements incompatibles de l'API
-- **MINOR** (1.0.0 → 1.1.0) : Nouvelles fonctionnalités compatibles
-- **PATCH** (1.0.0 → 1.0.1) : Corrections de bugs compatibles
-
-### 📋 Gestion des Releases
-
-```bash
-# Créer une nouvelle release patch (corrections de bugs)
-./scripts/create-release.sh patch "Fix security vulnerabilities"
-
-# Créer une nouvelle release minor (nouvelles fonctionnalités)
-./scripts/create-release.sh minor "Add new API endpoints"
-
-# Créer une nouvelle release major (changements majeurs)
-./scripts/create-release.sh major "Breaking changes in API"
-
-# Voir la version actuelle
-./scripts/create-release.sh --current
-
-# Voir toutes les versions
-git tag -l
-```
-
-### 📦 Artefacts et Releases
-
-- **GitHub Releases** : Chaque tag crée automatiquement une release sur GitHub
-- **Docker Images** : Taggées automatiquement avec la version (ex: `app:v1.1.0`)
-- **Changelog** : Généré automatiquement à partir des commits conventionnels
-
-**Version actuelle :** `v1.1.1` 🎉
-
-## 📁 Structure du Projet
-
-```
-EvaluationCICD/
-├── api/                          # Code de l'API REST
-│   ├── src/
-│   │   ├── config/              # Configuration (logger, etc.)
-│   │   ├── middleware/          # Middlewares Express
-│   │   ├── models/              # Modèles de données
-│   │   ├── routes/              # Définition des routes
-│   │   └── app.js               # Point d'entrée de l'application
-│   └── tests/
-│       ├── unit/                # Tests unitaires
-│       └── integration/         # Tests d'intégration
-├── terraform/                   # Infrastructure as Code AWS
-│   ├── main.tf                  # Configuration principale
-│   ├── vpc.tf                   # Réseau et sécurité
-│   ├── compute.tf               # EC2, Auto Scaling
-│   └── database.tf              # RDS configuration
-├── ansible/                     # Playbooks et rôles Ansible
-│   ├── roles/                   # Rôles modulaires
-│   ├── inventories/             # Inventaires d'environnements
-│   └── playbook.yml             # Playbook principal
-├── .github/workflows/           # Pipelines GitHub Actions
-│   ├── ci.yml                   # Pipeline d'intégration continue
-│   ├── cd.yml                   # Pipeline de déploiement
-│   └── security.yml             # Scans de sécurité
-├── monitoring/                  # Configuration monitoring + logs
-│   ├── health-checks.js         # Module de monitoring avancé
-│   └── logs/                   # Fichiers de logs rotatifs
-├── snapshots/                   # Système de sauvegarde automatisé
-│   └── create-snapshot.sh       # Script de création de snapshots
-├── rollback/                    # Scripts de restauration sécurisée
-│   └── restore-snapshot.sh      # Script de rollback automatisé
-├── scripts/                     # Scripts d'automatisation
-│   └── create-release.sh        # Versionnement sémantique automatisé
-├── docs/                        # Documentation technique
-├── package.json                 # Dépendances Node.js
-└── README.md                    # Ce fichier
-```
-
-## 🚀 Installation et Démarrage
+## 🚀 Quick Start
 
 ### Prérequis
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- Docker (optionnel)
-- **Terraform >= 1.0** (pour l'infrastructure cloud)
-- **Ansible >= 2.9** (pour l'automatisation)
-- **AWS CLI** configuré (pour le déploiement)
+
+- Node.js 18+ et npm 9+
+- Git
 
 ### Installation
+
 ```bash
 # Cloner le repository
-git clone https://github.com/Kevinmrgt/EvalutationCICD.git
-cd EvalutationCICD
+git clone https://github.com/kevinmrgt/evalutationcicd.git
+cd evalutationcicd
 
 # Installer les dépendances
 npm install
 
-# Copier et configurer les variables d'environnement
+# Copier le fichier d'environnement
 cp env.example .env
-# Éditer .env selon vos besoins
-```
 
-### Démarrage
-```bash
-# Mode développement avec hot-reload
-npm run dev
-
-# Mode production
+# Lancer l'application
 npm start
-
-# Tests et qualité
-npm run build  # lint + tests
-
-# Avec Docker
-npm run docker:build
-npm run docker:run
-
-# Docker Compose (environnement complet)
-npm run docker:dev
-
-# Déploiement Infrastructure
-./scripts/deploy.sh init              # Initialiser le projet
-./scripts/deploy.sh plan              # Planifier le déploiement  
-./scripts/deploy.sh deploy            # Déployer l'infrastructure complète
-./scripts/deploy.sh status            # Voir le statut des services
 ```
 
-## 📡 API Endpoints
-
-### Documentation et Métadonnées
-- `GET /` - Page d'accueil avec informations sur l'API
-- `GET /api` - Documentation des endpoints disponibles
-- `GET /api/docs` - Documentation détaillée de l'API
-
-### Monitoring et Health Checks (Kubernetes-style)
-- `GET /health` - Health check détaillé avec métriques système complètes
-- `GET /health/live` - Liveness probe (disponibilité du service)
-- `GET /health/ready` - Readiness probe avec vérification des services externes
-- `GET /metrics` - Métriques Prometheus (format texte standard)
-
-### Utilisateurs (CRUD complet)
-- `GET /api/users` - Liste des utilisateurs (avec pagination)
-- `GET /api/users/:id` - Détails d'un utilisateur
-- `POST /api/users` - Créer un utilisateur (validation Joi)
-- `PUT /api/users/:id` - Mettre à jour un utilisateur
-- `DELETE /api/users/:id` - Supprimer un utilisateur
-
-### Tâches (CRUD avec filtres)
-- `GET /api/tasks` - Liste des tâches (avec filtres de statut)
-- `GET /api/tasks/:id` - Détails d'une tâche
-- `POST /api/tasks` - Créer une tâche
-- `PUT /api/tasks/:id` - Mettre à jour une tâche
-- `DELETE /api/tasks/:id` - Supprimer une tâche
-- `PATCH /api/tasks/:id/status` - Changer le statut d'une tâche
-
-## 🧪 Tests et Qualité
+### Commandes disponibles
 
 ```bash
-# Lancer tous les tests
-npm test
+# Développement
+npm run dev          # Mode développement avec nodemon
+npm test            # Tous les tests
+npm run test:watch  # Tests en mode watch
+npm run test:coverage # Tests avec couverture
 
-# Tests avec couverture de code
-npm run test:coverage
+# Qualité de code
+npm run lint        # Vérifier le code
+npm run lint:fix    # Corriger automatiquement
+npm run format      # Formatter le code
+npm run build       # Build complet (lint + tests)
 
-# Tests en mode watch (développement)
-npm run test:watch
-
-# Test de l'API en conditions réelles
-npm run test:api
-
-# Linting et formatage
-npm run lint                # Vérifier la qualité du code
-npm run lint:fix           # Corriger automatiquement
-npm run format             # Formater avec Prettier
-npm run format:check       # Vérifier le formatage
-
-# Build complet (lint + tests)
-npm run build
+# API
+npm run test:api    # Tester l'API en live
 ```
 
-## 📊 Fonctionnalités de Monitoring Avancées
+L'API sera accessible sur http://localhost:3000
 
-### Health Checks Détaillés
-- **Liveness** (`/health/live`) : Vérification de base du service
-- **Readiness** (`/health/ready`) : Vérification des dépendances externes
-- **Health** (`/health`) : Métriques système complètes (CPU, RAM, uptime)
+## 📚 Documentation API
 
-### Métriques Prometheus
-- **Compteurs de requêtes** par endpoint et code de statut
-- **Histogrammes de latence** des requêtes HTTP
+### Endpoints principaux
+
+- `GET /health` - Health check complet avec métriques système
+- `GET /health/live` - Liveness probe
+- `GET /health/ready` - Readiness probe  
+- `GET /metrics` - Métriques Prometheus
+- `GET /api/users` - Liste des utilisateurs
+- `POST /api/users` - Créer un utilisateur
+- `GET /api/tasks` - Liste des tâches
+- `POST /api/tasks` - Créer une tâche
+
+### Réponses API
+
+```json
+{
+  "success": true,
+  "data": [...],
+  "message": "Success"
+}
+```
+
+## 🔄 Pipeline CI/CD
+
+### Workflow CI (`ci.yml`)
+1. **🧪 Tests & Qualité** - ESLint, Prettier, Jest (Node 18.x, 20.x)
+2. **🔒 Audit Sécurité** - npm audit, Snyk
+3. **⚡ Tests Performance** - Artillery (sur PR uniquement)
+
+### Workflow CD (`cd.yml`)
+1. **🧪 Déploiement Staging** - Build et déploiement automatique
+2. **🌟 Déploiement Production** - Après approbation manuelle
+3. **📦 Releases** - Création automatique sur tags
+
+### Workflow Sécurité (`security.yml`)
+1. **🔍 Scan Dépendances** - npm audit, Snyk
+2. **🔍 Analyse Statique** - CodeQL, Semgrep  
+3. **🔐 Détection Secrets** - TruffleHog, GitLeaks
+4. **📋 Rapport Synthèse** - Résumé consolidé
+
+## 🏗 Infrastructure
+
+### Terraform
+- **Configuration AWS** : EC2, VPC, Security Groups
+- **Multi-environnements** : dev, staging, production
+- **Modules réutilisables** : network, compute, security
+
+### Ansible
+- **Playbooks automatisés** : Installation Node.js, déploiement app
+- **Rôles structurés** : nodejs, app-deploy, monitoring
+- **Inventaire dynamique** : Configuration par environnement
+
+### Scripts d'automatisation
+- `scripts/create-release.sh` - Création de releases automatisées
+- `snapshots/create-snapshot.sh` - Sauvegarde complète du projet
+- `rollback/restore-snapshot.sh` - Restauration d'état précédent
+
+## 📊 Monitoring et Observabilité
+
+### Health Checks
+- **Endpoint `/health`** : État complet de l'application
 - **Métriques système** : CPU, mémoire, uptime
-- **Métriques applicatives** : nombre d'utilisateurs, tâches, erreurs
+- **Statut dépendances** : Base de données, services externes
 
-### Logs Structurés
-- **Rotation automatique** des fichiers de logs
-- **Niveaux de log** configurables (error, warn, info, debug)
-- **Format JSON** pour analyse automatisée
-- **Logs HTTP** détaillés avec Morgan
+### Logs
+- **Winston** pour logging structuré
+- **Niveaux** : error, warn, info, debug
+- **Formats** : JSON en production, lisible en développement
 
-## 🔄 Sauvegarde et Restauration
+### Métriques
+- **Endpoint `/metrics`** : Format Prometheus
+- **Compteurs** : Requêtes, erreurs, latence
+- **Monitoring** : Surveillance continue
+
+## 🔄 Snapshots et Rollback
 
 ### Système de Snapshots
-```bash
-# Créer un snapshot complet
-./snapshots/create-snapshot.sh
+- **Sauvegarde automatisée** : Code, configuration, métadonnées
+- **Compression** : Archives optimisées avec horodatage
+- **Versionning** : Traçabilité complète des changements
 
-# Le snapshot inclut :
-# - Code source de l'application
-# - Configuration Terraform/Ansible
-# - Workflows GitHub Actions
-# - Base de données (dump)
-# - Métadonnées Git avec hash du commit
+### Rollback sécurisé
+- **Restauration rapide** : Retour à un état stable précédent
+- **Sauvegarde préalable** : Protection contre les pertes
+- **Vérification post-rollback** : Validation automatique
+
+```bash
+# Créer un snapshot
+./snapshots/create-snapshot.sh "Description du snapshot"
+
+# Restaurer depuis un snapshot  
+./rollback/restore-snapshot.sh snapshots/2025-01-XX_XX-XX-XX
 ```
 
-### Rollback Sécurisé
-```bash
-# Restaurer depuis un snapshot
-./rollback/restore-snapshot.sh <nom_du_snapshot>
+## 🔀 GitFlow et Versionnement
 
-# Le rollback inclut :
-# - Sauvegarde préalable de l'état actuel
-# - Restauration du code et de la configuration
-# - Vérification post-restauration
-# - Rapport détaillé des opérations
+### Branches
+- **main** : Production stable
+- **develop** : Intégration continue
+- **feature/** : Nouvelles fonctionnalités
+- **hotfix/** : Corrections urgentes
+
+### Versionnement Sémantique
+- **Format** : MAJOR.MINOR.PATCH (ex: v1.1.1)
+- **Automatisation** : Script de release intégré
+- **Tags Git** : Synchronisation avec releases GitHub
+
+```bash
+# Créer une nouvelle version
+./scripts/create-release.sh patch  # v1.1.2
+./scripts/create-release.sh minor  # v1.2.0  
+./scripts/create-release.sh major  # v2.0.0
 ```
 
-## 🏷️ Gestion des Versions
+## 📁 Structure du Projet
 
-Le projet utilise un système de versionnement sémantique automatisé :
-
-### Versions Actuelles
-- **v1.0.0** : Version initiale avec fonctionnalités de base
-- **v1.0.1** : Corrections de bugs et améliorations de sécurité  
-- **v1.1.0** : Ajout du monitoring avancé et système de snapshots
-- **v1.1.1** : Correction des erreurs de déploiement CI/CD et amélioration de la couverture de tests
-
-### Création de Releases
-```bash
-# Version patch (corrections de bugs)
-./scripts/create-release.sh patch "Fix critical security issue"
-
-# Version minor (nouvelles fonctionnalités)
-./scripts/create-release.sh minor "Add advanced monitoring features"
-
-# Version major (changements incompatibles)
-./scripts/create-release.sh major "New API version with breaking changes"
 ```
-
-## 🚀 Infrastructure et Déploiement
-
-### Terraform (Infrastructure as Code)
-- **VPC** avec subnets publics/privés
-- **EC2** avec Auto Scaling Groups
-- **Application Load Balancer** avec SSL/TLS
-- **RDS** avec Multi-AZ et backup automatique
-- **Security Groups** avec règles restrictives
-
-### Ansible (Configuration Management)
-- **Rôles modulaires** : nginx, nodejs, monitoring
-- **Inventaires d'environnements** : dev, staging, prod
-- **Playbooks idempotents** pour configuration cohérente
-- **Variables chiffrées** avec Ansible Vault
-
-### Pipeline CI/CD (explication + lien vers les fichiers)
-
-Le pipeline CI/CD suit exactement la structure demandée avec les étapes suivantes :
-
-#### 🚀 Pipeline Principal (`.github/workflows/pipeline.yml`)
-1. **🔍 Lint** - Vérification de la qualité et du formatage du code
-2. **🧪 Test** - Tests unitaires, d'intégration et de couverture de code
-3. **🏗️ Build** - Compilation de l'application et création des artefacts
-4. **📦 Packaging** - Création et test de l'image Docker
-5. **🧪 Déploiement staging** - Déploiement automatique en environnement de test
-6. **🌟 Déploiement production** - Déploiement en production (main branch)
-7. **📸 Snapshot** - Création automatique de sauvegarde post-déploiement
-8. **🔄 Rollback** - Restauration automatique en cas d'échec
-
-#### 🔄 Rollback Manuel (`.github/workflows/rollback-manual.yml`)
-- **Rollback à la demande** via interface GitHub Actions
-- **Validation des snapshots** disponibles
-- **Sauvegarde pré-rollback** pour sécurité maximale
-- **Validation post-rollback** automatique
-
-#### 🛠️ Outils et Scripts
-```bash
-# Lister les snapshots disponibles pour rollback
-./scripts/list-snapshots.sh
-
-# Voir les snapshots en format tableau
-./scripts/list-snapshots.sh --format=table
-
-# Voir les snapshots en format JSON
-./scripts/list-snapshots.sh --format=json
+evalutationcicd/
+├── api/                    # Code source de l'API
+│   ├── src/               # Code applicatif
+│   └── tests/             # Tests unitaires et intégration
+├── .github/               # Workflows GitHub Actions
+├── terraform/             # Infrastructure as Code
+├── ansible/               # Configuration et déploiement  
+├── monitoring/            # Health checks et métriques
+├── snapshots/             # Système de sauvegarde
+├── rollback/              # Scripts de restauration
+├── scripts/               # Utilitaires d'automatisation
+└── docs/                  # Documentation technique
 ```
-
-## 📚 Documentation
-
-- **README.md** : Documentation principale (ce fichier)
-- **STATUS_FINAL.md** : Statut détaillé du projet avec score 20/20
-- **Etape.md** : Journal détaillé des étapes d'implémentation
-- **NEXT_STEPS.md** : Prochaines améliorations possibles
-- **CORRECTIONS_DEPLOY.md** : Corrections et optimisations apportées
-
-## 🎯 Principe de Simplicité
-
-Ce projet respecte le **principe de simplicité** en privilégiant :
-- ✅ **Solutions minimales viables** qui répondent exactement aux besoins
-- ✅ **Scripts bash simples** plutôt que des outils complexes
-- ✅ **Fonctionnalité avant complexité** technique
-- ✅ **Documentation claire** et accessible
-
-## 🔒 Sécurité
-
-- **Helmet.js** : Headers de sécurité HTTP
-- **CORS** configuré pour les domaines autorisés
-- **Rate Limiting** contre les attaques DDoS
-- **Validation stricte** des entrées avec Joi
-- **Scans automatisés** avec GitHub Security Advisories
-- **Variables d'environnement** pour les secrets
-
-## 📈 Performance
-
-- **Monitoring continu** avec métriques Prometheus
-- **Logs rotatifs** pour éviter la saturation disque
-- **Health checks** optimisés pour Kubernetes
-- **Docker multi-stage** pour des images légères
-- **Mise en cache** des dépendances npm
 
 ## 🤝 Contribution
 
-Ce projet est évalué dans le cadre de la formation YNOV DevOps. Pour toute question :
-
-- **Auteur** : Kevin - Étudiant YNOV DevOps
-- **Email** : [contact@kevin-dev.fr](mailto:contact@kevin-dev.fr)
-- **LinkedIn** : [Kevin Margot](https://linkedin.com/in/kevin-margot)
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/amazing-feature`)
+3. Commit les changements (`git commit -m 'Add amazing feature'`)
+4. Push vers la branche (`git push origin feature/amazing-feature`)
+5. Ouvrir une Pull Request
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ---
 
-## 🎉 Conclusion
-
-**Mission accomplie !** Ce projet démontre une maîtrise complète des pratiques DevOps modernes avec un score parfait de **20/20 points**. 
-
-Toutes les fonctionnalités critiques ont été implémentées avec des solutions robustes, sécurisées et bien documentées, prêtes pour un environnement de production.
-
-**Le projet est prêt pour l'évaluation finale YNOV DevOps.** 
+**Développé avec ❤️ pour l'évaluation DevOps YNOV** 
