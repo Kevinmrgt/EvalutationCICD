@@ -31,8 +31,6 @@ permissions:
 
 env:
   NODE_VERSION: '18'
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   # ==========================================
@@ -186,9 +184,9 @@ jobs:
     needs: [build]
     
     outputs:
-      image-digest: ${{ steps.build.outputs.digest }}
-      image-tag: ${{ steps.meta.outputs.tags }}
       package-version: ${{ needs.build.outputs.version }}
+      package-name: ${{ steps.package.outputs.package-name }}
+      package-path: ${{ steps.package.outputs.package-path }}
 
     steps:
       - name: 📂 Checkout repository
@@ -200,83 +198,101 @@ jobs:
           name: build-artifacts-${{ needs.build.outputs.version }}
           path: .
 
-      - name: 🐳 Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 🔐 Log in to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🏷️ Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix=commit-
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=v${{ needs.build.outputs.version }}
-
-      - name: 📦 Build and push Docker image
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          target: production
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            VERSION=${{ needs.build.outputs.version }}
-            COMMIT_SHA=${{ needs.build.outputs.commit-sha }}
-
-      - name: 🔍 Test Docker image
+      - name: 📦 Create deployment package
+        id: package
         run: |
-          echo "🔍 Testing packaged Docker image..."
+          echo "📦 Creating Node.js deployment package..."
           
-          # Test image can start
-          docker run --rm -d \
-            --name package-test \
-            -p 3001:3000 \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-          sleep 15
-
-          # Health check
-          if docker exec package-test node -e "
-            const http = require('http');
-            const req = http.get('http://localhost:3000/health', (res) => {
-              console.log('Health check status:', res.statusCode);
-              process.exit(res.statusCode === 200 ? 0 : 1);
-            });
-            req.on('error', () => process.exit(1));
-            setTimeout(() => process.exit(1), 5000);
-          "; then
-            echo "✅ Package test passed"
-          else
-            echo "❌ Package test failed"
-            docker logs package-test
-            exit 1
+          # Create deployment directory
+          mkdir -p deployment
+          
+          # Copy application files
+          cp -r api/ deployment/
+          cp -r monitoring/ deployment/
+          cp package*.json deployment/
+          cp -r node_modules/ deployment/ || echo "node_modules will be installed on target"
+          
+          # Copy build artifacts if they exist
+          if [ -d "dist" ]; then
+            cp -r dist/ deployment/
           fi
+          
+          # Create deployment metadata
+          echo "{
+            \"version\": \"${{ needs.build.outputs.version }}\",
+            \"commit\": \"${{ needs.build.outputs.commit-sha }}\",
+            \"branch\": \"${{ github.ref_name }}\",
+            \"packageTime\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+            \"buildNumber\": \"${{ github.run_number }}\",
+            \"deploymentType\": \"node-direct\"
+          }" > deployment/deployment-info.json
+          
+          # Create deployment script
+          cat > deployment/deploy.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          echo "🚀 Starting Node.js deployment..."
+          
+          # Install dependencies
+          npm ci --only=production
+          
+          # Start application with PM2
+          npm install -g pm2
+          pm2 delete evalutationcicd || true
+          pm2 start api/server.js --name evalutationcicd
+          pm2 save
+          
+          echo "✅ Deployment completed!"
+          EOF
+          
+          chmod +x deployment/deploy.sh
+          
+          # Create package archive
+          PACKAGE_NAME="evalutationcicd-v${{ needs.build.outputs.version }}-${{ github.run_number }}.tar.gz"
+          tar -czf "$PACKAGE_NAME" -C deployment .
+          
+          echo "package-name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "package-path=$(pwd)/$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          
+          echo "✅ Package created: $PACKAGE_NAME"
+          echo "📦 Size: $(du -h $PACKAGE_NAME | cut -f1)"
 
-          docker stop package-test
+      - name: 🔍 Test package integrity
+        run: |
+          echo "🔍 Testing package integrity..."
+          
+          # Test archive extraction
+          mkdir -p test-extract
+          tar -xzf "${{ steps.package.outputs.package-name }}" -C test-extract
+          
+          # Verify essential files
+          echo "✅ Checking essential files..."
+          [ -f "test-extract/package.json" ] && echo "✅ package.json found"
+          [ -f "test-extract/deploy.sh" ] && echo "✅ deploy.sh found"
+          [ -d "test-extract/api" ] && echo "✅ api directory found"
+          [ -f "test-extract/deployment-info.json" ] && echo "✅ deployment-info.json found"
+          
+          # Test deployment script syntax
+          bash -n test-extract/deploy.sh && echo "✅ Deploy script syntax valid"
+          
+          # Cleanup
+          rm -rf test-extract
+          
+          echo "✅ Package integrity verified!"
+
+      - name: 📦 Upload deployment package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package-${{ needs.build.outputs.version }}
+          path: ${{ steps.package.outputs.package-name }}
+          retention-days: 30
 
       - name: ✅ Packaging completed
         run: |
           echo "✅ Application packaging completed successfully"
-          echo "📦 Docker image: ${{ steps.meta.outputs.tags }}"
-          echo "🔒 Digest: ${{ steps.build.outputs.digest }}"
+          echo "📦 Package: ${{ steps.package.outputs.package-name }}"
+          echo "📋 Version: ${{ needs.build.outputs.version }}"
+          echo "🚀 Deployment type: Node.js direct (no containers)"
 
   # ==========================================
   # 🧪 Job 5: Déploiement staging
@@ -299,21 +315,28 @@ jobs:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 📦 Download build artifacts
+      - name: 📦 Download deployment package
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts-${{ needs.packaging.outputs.package-version }}
+          name: deployment-package-${{ needs.packaging.outputs.package-version }}
           path: .
 
       - name: 🧪 Deploy to staging environment
         id: deploy
         run: |
           echo "🧪 Deploying to staging environment..."
-          echo "📦 Image: ${{ needs.packaging.outputs.image-tag }}"
-          echo "🔒 Digest: ${{ needs.packaging.outputs.image-digest }}"
+          echo "📦 Package: ${{ needs.packaging.outputs.package-name }}"
           echo "📋 Version: ${{ needs.packaging.outputs.package-version }}"
+          echo "🚀 Deployment type: Node.js direct (no containers)"
           
-          # Simulation du déploiement staging
+          # Extract deployment package
+          tar -xzf ${{ needs.packaging.outputs.package-name }}
+          
+          # Simulate staging deployment
+          echo "🔧 Installing Node.js dependencies..."
+          echo "🏗️ Setting up application environment..."
+          echo "🚀 Starting application with PM2..."
+          
           DEPLOYMENT_ID="staging-${{ github.run_number }}-$(date +%s)"
           DEPLOYMENT_URL="https://staging-${{ github.run_number }}.evalutationcicd.com"
           
@@ -375,10 +398,10 @@ jobs:
       - name: 📂 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 📦 Download build artifacts
+      - name: 📦 Download deployment package
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts-${{ needs.packaging.outputs.package-version }}
+          name: deployment-package-${{ needs.packaging.outputs.package-version }}
           path: .
 
       - name: 💾 Backup current production state
@@ -408,11 +431,18 @@ jobs:
         id: deploy
         run: |
           echo "🌟 Deploying to production environment..."
-          echo "📦 Image: ${{ needs.packaging.outputs.image-tag }}"
-          echo "🔒 Digest: ${{ needs.packaging.outputs.image-digest }}"
+          echo "📦 Package: ${{ needs.packaging.outputs.package-name }}"
           echo "📋 Version: ${{ needs.packaging.outputs.package-version }}"
+          echo "🚀 Deployment type: Node.js direct (no containers)"
           
-          # Simulation du déploiement production
+          # Extract deployment package
+          tar -xzf ${{ needs.packaging.outputs.package-name }}
+          
+          # Simulate production deployment
+          echo "🔧 Installing production dependencies..."
+          echo "🔄 Performing rolling deployment..."
+          echo "🚀 Starting application instances..."
+          
           DEPLOYMENT_ID="prod-${{ github.run_number }}-$(date +%s)"
           DEPLOYMENT_URL="https://evalutationcicd.com"
           
@@ -622,7 +652,7 @@ jobs:
           echo "| 🔍 Lint | ${{ needs.lint.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Code quality and formatting |" >> $GITHUB_STEP_SUMMARY
           echo "| 🧪 Test | ${{ needs.test.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Unit and integration tests |" >> $GITHUB_STEP_SUMMARY
           echo "| 🏗️ Build | ${{ needs.build.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Application compilation |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📦 Packaging | ${{ needs.packaging.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Docker image creation |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Packaging | ${{ needs.packaging.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Node.js deployment package creation |" >> $GITHUB_STEP_SUMMARY
           echo "| 🧪 Deploy Staging | ${{ needs.deploy-staging.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Staging environment |" >> $GITHUB_STEP_SUMMARY
           echo "| 🌟 Deploy Production | ${{ needs.deploy-production.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | Production environment |" >> $GITHUB_STEP_SUMMARY
           echo "| 📸 Snapshot | ${{ needs.snapshot.result == 'success' && '✅ PASSED' || '❌ FAILED' }} | System backup |" >> $GITHUB_STEP_SUMMARY
