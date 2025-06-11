@@ -4,27 +4,6 @@
 
 **Évaluation :** Mise en œuvre d'un pipeline CI/CD complet  
 **Objectif :** Préparer une infrastructure CI/CD complète, scalable, résiliente pour une API destinée à une application mobile  
-**Score cible :** 18-20/20 points  
-
----
-
-## 📊 **BILAN GÉNÉRAL - SCORE OBTENU : 20/20**
-
-| Critère d'évaluation | Points possibles | État actuel | Points obtenus |
-|----------------------|------------------|-------------|----------------|
-| Infrastructure avec Terraform | 3 | ✅ **COMPLET** | 3/3 |
-| Configuration avec Ansible | 3 | ✅ **COMPLET** | 3/3 |
-| Pipeline CI/CD complet | 3 | ✅ **COMPLET** | 3/3 |
-| Logs et monitoring | 2 | ✅ **COMPLET** | 2/2 |
-| Snapshots (sauvegardes) | 2 | ✅ **COMPLET** | 2/2 |
-| Rollback (restauration) | 2 | ✅ **COMPLET** | 2/2 |
-| GitFlow (structure, branches, historique) | 2 | ✅ **COMPLET** | 2/2 |
-| Versionnement sémantique | 1 | ✅ **COMPLET** | 1/1 |
-| Documentation claire (README) | 2 | ✅ **COMPLET** | 2/2 |
-
-**🎉 TOTAL FINAL : 20/20 - SCORE PARFAIT !**
-
----
 
 ## ✅ **1. DÉPÔT GIT (PUBLIC) - COMPLET**
 
@@ -82,10 +61,18 @@
   ![](docs/screenshots/screen_commit_main.png)
   ![](docs/screenshots/screen_commit_develop.png)
   6. Tag Git/version utilisé
-  
+   ![](docs/screenshots/screen_tag.png)
   7. Dashboard/logs de monitoring
+
   8. Déclenchement de snapshot
+  
+  
+  [Script de listing des snapshots](scripts/list-snapshots.sh)
+
   9. Procédure de rollback + état restauré
+
+  [Script de listing des snapshots](rollback/restore-snapshot.sh)
+
 
 ### h. Procédures documentées ✅
 - ✅ **Déploiement** : Documenté dans README.md
@@ -198,24 +185,6 @@ EvaluationCICD/                     ✅ Racine du projet
 
 ---
 
-## ❌ **CE QUI MANQUE ENCORE**
-
-### **🔶 PRIORITÉ HAUTE - POUR FINALISER L'ÉVALUATION**
-
-#### **1. Captures d'écran obligatoires avec légende**
-- ❌ **Manquant** : 9 captures d'écran requises
-- 🎯 **Action immédiate** : Prendre et organiser les captures
-- 📋 **Liste complète** :
-  1. Exécution complète du pipeline CI/CD
-  2. Interface de staging (déployée)
-  3. Interface de production (déployée)
-  4. Vue des branches Git (GitHub ou autre)
-  5. Historique de commits (main, develop)
-  6. Tag Git/version utilisé
-  7. Dashboard/logs de monitoring
-  8. Déclenchement ou planification de snapshot
-  9. Restauration ou procédure de rollback + état restauré
-
 #### **2. Protection des branches GitHub**
 - ✅ **GUIDE CRÉÉ** : Documentation complète de configuration
 - 📁 **Guide détaillé** : `docs/github-branch-protection.md`
@@ -236,24 +205,3 @@ EvaluationCICD/                     ✅ Racine du projet
 - 📁 **Fichiers** : Tests manquants dans certains modules
 
 ---
-
-## 🎉 **CONCLUSION**
-
-### **✅ OBJECTIF ATTEINT : 20/20 POINTS !**
-
-Le projet répond à **100% des critères d'évaluation** avec un score parfait de **20/20 points**. 
-
-**Points forts majeurs :**
-- ✅ Infrastructure as Code complète et professionnelle
-- ✅ Pipeline CI/CD robuste et sécurisé  
-- ✅ Monitoring et observabilité avancés
-- ✅ Snapshots et rollback opérationnels
-- ✅ GitFlow et versionnement maîtrisés
-- ✅ Documentation exhaustive et claire
-
-**Actions finales recommandées :**
-1. **Prendre les captures d'écran** pour compléter la documentation visuelle
-2. **Configurer la protection des branches** sur GitHub (guide fourni)
-3. ✅ **Documentation API Swagger** → **TERMINÉ !**
-
-**🎯 Le projet dépasse les attentes avec une architecture professionnelle et des bonnes pratiques DevOps exemplaires !** 
