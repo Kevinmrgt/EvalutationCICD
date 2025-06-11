@@ -1,0 +1,49 @@
+# Exemple de fichier terraform.tfvars
+# Copiez ce fichier vers terraform.tfvars et modifiez les valeurs selon vos besoins
+
+# Configuration générale
+project_name = "cicd-nodejs"
+environment  = "dev"
+
+# Configuration AWS
+aws_region         = "eu-west-1"
+availability_zones = ["eu-west-1a", "eu-west-1b"]
+
+# Configuration réseau
+vpc_cidr = "10.0.0.0/16"
+
+# Sécurité - IMPORTANT: Restreignez ces CIDR en production
+allowed_ssh_cidrs = ["0.0.0.0/0"]  # À remplacer par votre IP publique
+
+# Configuration de l'application
+app_port = 3000
+
+# Configuration des instances EC2
+# Obtenez l'AMI ID pour votre région depuis la console AWS
+ami_id        = "ami-0c02fb55956c7d316"  # Amazon Linux 2 (à adapter selon la région)
+instance_type = "t3.micro"
+key_pair_name = "my-key-pair"  # Nom de votre clé SSH existante dans AWS
+
+# Configuration Auto Scaling
+min_instances     = 1
+max_instances     = 3
+desired_instances = 2
+
+# Configuration base de données
+create_rds         = false  # true pour créer une instance RDS
+db_engine          = "postgres"
+db_engine_version  = "14.9"
+db_instance_class  = "db.t3.micro"
+db_allocated_storage = 20
+db_name            = "nodejs_app"
+db_username        = "admin"
+db_password        = "ChangeMePlease123!"  # Utilisez un mot de passe fort
+db_port            = 5432
+
+# Tags par défaut
+default_tags = {
+  Terraform   = "true"
+  Project     = "cicd-nodejs"
+  Owner       = "your-name"
+  CostCenter  = "development"
+} 
