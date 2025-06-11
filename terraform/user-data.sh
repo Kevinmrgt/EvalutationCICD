@@ -38,8 +38,8 @@ yum install -y \
     amazon-cloudwatch-agent
 
 # Installation de Node.js via NodeSource
-log "Installation de Node.js $NODE_VERSION"
-curl -fsSL https://rpm.nodesource.com/setup_${NODE_VERSION}.x | bash -
+log "Installation de Node.js ${node_version}"
+curl -fsSL https://rpm.nodesource.com/setup_${node_version}.x | bash -
 yum install -y nodejs
 
 # Vérification de l'installation Node.js
@@ -150,8 +150,8 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log(`Health check server running on port ${process.env.PORT || 3000}`);
+server.listen(process.env.PORT || ${app_port}, () => {
+  console.log(`Health check server running on port $${process.env.PORT || ${app_port}}`);
 });
 EOF
 

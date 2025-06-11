@@ -7,7 +7,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
+
   # Backend pour stocker l'état Terraform (optionnel en dev)
   # backend "s3" {
   #   bucket = "votre-bucket-terraform-state"
@@ -19,7 +19,7 @@ terraform {
 # Configuration du provider AWS
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -52,7 +52,7 @@ resource "aws_internet_gateway" "main" {
 # Subnet public pour les ressources accessibles depuis Internet
 resource "aws_subnet" "public" {
   count = length(var.availability_zones)
-  
+
   vpc_id                  = aws_vpc.main.id
   cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index + 1)
   availability_zone       = var.availability_zones[count.index]
@@ -67,7 +67,7 @@ resource "aws_subnet" "public" {
 # Subnet privé pour les ressources internes
 resource "aws_subnet" "private" {
   count = length(var.availability_zones)
-  
+
   vpc_id            = aws_vpc.main.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
   availability_zone = var.availability_zones[count.index]
@@ -95,7 +95,7 @@ resource "aws_route_table" "public" {
 # Association des subnets publics avec la route table
 resource "aws_route_table_association" "public" {
   count = length(aws_subnet.public)
-  
+
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
@@ -231,7 +231,8 @@ resource "aws_launch_template" "app" {
   vpc_security_group_ids = [aws_security_group.web.id]
 
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
-    app_port = var.app_port
+    app_port     = var.app_port
+    node_version = var.node_version
   }))
 
   tag_specifications {
@@ -253,7 +254,7 @@ resource "aws_autoscaling_group" "app" {
   vpc_zone_identifier = aws_subnet.public[*].id
   target_group_arns   = [aws_lb_target_group.app.arn]
   health_check_type   = "ELB"
-  
+
   min_size         = var.min_instances
   max_size         = var.max_instances
   desired_capacity = var.desired_instances
@@ -291,24 +292,24 @@ resource "aws_db_instance" "main" {
   count = var.create_rds ? 1 : 0
 
   identifier = "${var.project_name}-db-${var.environment}"
-  
-  allocated_storage    = var.db_allocated_storage
-  storage_type         = "gp2"
-  engine               = var.db_engine
-  engine_version       = var.db_engine_version
-  instance_class       = var.db_instance_class
-  
+
+  allocated_storage = var.db_allocated_storage
+  storage_type      = "gp2"
+  engine            = var.db_engine
+  engine_version    = var.db_engine_version
+  instance_class    = var.db_instance_class
+
   db_name  = var.db_name
   username = var.db_username
   password = var.db_password
-  
+
   vpc_security_group_ids = [aws_security_group.database.id]
   db_subnet_group_name   = aws_db_subnet_group.main.name
-  
+
   backup_retention_period = var.environment == "production" ? 7 : 1
-  backup_window          = "03:00-04:00"
-  maintenance_window     = "sun:04:00-sun:05:00"
-  
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "sun:04:00-sun:05:00"
+
   skip_final_snapshot = var.environment != "production"
   deletion_protection = var.environment == "production"
 

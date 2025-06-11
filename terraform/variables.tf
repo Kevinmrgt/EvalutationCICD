@@ -9,7 +9,7 @@ variable "environment" {
   description = "Environnement de déploiement (dev, staging, production)"
   type        = string
   default     = "dev"
-  
+
   validation {
     condition     = contains(["dev", "staging", "production"], var.environment)
     error_message = "Environment must be one of: dev, staging, production."
@@ -39,7 +39,7 @@ variable "vpc_cidr" {
 variable "allowed_ssh_cidrs" {
   description = "Liste des CIDR autorisés pour SSH"
   type        = list(string)
-  default     = ["0.0.0.0/0"]  # À restreindre en production
+  default     = ["0.0.0.0/0"] # À restreindre en production
 }
 
 # Configuration de l'application
@@ -49,10 +49,16 @@ variable "app_port" {
   default     = 3000
 }
 
+variable "node_version" {
+  description = "Version de Node.js à installer"
+  type        = string
+  default     = "18"
+}
+
 variable "ami_id" {
   description = "AMI ID pour les instances EC2"
   type        = string
-  default     = "ami-0c02fb55956c7d316"  # Amazon Linux 2 en us-east-1, à adapter selon la région
+  default     = "ami-0c02fb55956c7d316" # Amazon Linux 2 en us-east-1, à adapter selon la région
 }
 
 variable "instance_type" {
@@ -64,7 +70,7 @@ variable "instance_type" {
 variable "key_pair_name" {
   description = "Nom de la clé SSH pour accéder aux instances"
   type        = string
-  default     = ""  # À définir lors du déploiement
+  default     = "" # À définir lors du déploiement
 }
 
 # Configuration Auto Scaling
@@ -90,7 +96,7 @@ variable "desired_instances" {
 variable "create_rds" {
   description = "Créer une instance RDS"
   type        = bool
-  default     = false  # Désactivé par défaut pour éviter les coûts
+  default     = false # Désactivé par défaut pour éviter les coûts
 }
 
 variable "db_engine" {
@@ -133,13 +139,13 @@ variable "db_password" {
   description = "Mot de passe de la base de données"
   type        = string
   sensitive   = true
-  default     = ""  # À définir via terraform.tfvars ou variable d'environnement
+  default     = "" # À définir via terraform.tfvars ou variable d'environnement
 }
 
 variable "db_port" {
   description = "Port de la base de données"
   type        = number
-  default     = 5432  # PostgreSQL par défaut
+  default     = 5432 # PostgreSQL par défaut
 }
 
 # Configuration des tags par défaut

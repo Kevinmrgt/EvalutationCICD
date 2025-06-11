@@ -84,16 +84,16 @@ output "application_url" {
 output "ansible_inventory_data" {
   description = "Données pour générer l'inventaire Ansible"
   value = {
-    vpc_id                    = aws_vpc.main.id
-    subnet_ids               = aws_subnet.public[*].id
-    security_group_web_id    = aws_security_group.web.id
-    security_group_db_id     = aws_security_group.database.id
-    load_balancer_dns        = aws_lb.main.dns_name
-    target_group_arn         = aws_lb_target_group.app.arn
-    autoscaling_group_name   = aws_autoscaling_group.app.name
-    launch_template_id       = aws_launch_template.app.id
-    environment              = var.environment
-    app_port                 = var.app_port
+    vpc_id                 = aws_vpc.main.id
+    subnet_ids             = aws_subnet.public[*].id
+    security_group_web_id  = aws_security_group.web.id
+    security_group_db_id   = aws_security_group.database.id
+    load_balancer_dns      = aws_lb.main.dns_name
+    target_group_arn       = aws_lb_target_group.app.arn
+    autoscaling_group_name = aws_autoscaling_group.app.name
+    launch_template_id     = aws_launch_template.app.id
+    environment            = var.environment
+    app_port               = var.app_port
   }
 }
 
@@ -101,12 +101,12 @@ output "ansible_inventory_data" {
 output "deployment_info" {
   description = "Informations nécessaires pour le déploiement"
   value = {
-    region                   = var.aws_region
-    environment              = var.environment
-    load_balancer_dns        = aws_lb.main.dns_name
-    autoscaling_group_name   = aws_autoscaling_group.app.name
-    app_port                 = var.app_port
-    vpc_id                   = aws_vpc.main.id
+    region                 = var.aws_region
+    environment            = var.environment
+    load_balancer_dns      = aws_lb.main.dns_name
+    autoscaling_group_name = aws_autoscaling_group.app.name
+    app_port               = var.app_port
+    vpc_id                 = aws_vpc.main.id
   }
   sensitive = false
 } 
