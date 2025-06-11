@@ -50,7 +50,60 @@ const updateTaskSchema = Joi.object({
   dueDate: Joi.date().allow(null).optional(),
 });
 
-// GET /api/tasks - Récupérer toutes les tâches
+/**
+ * @swagger
+ * /api/tasks:
+ *   get:
+ *     summary: Récupérer toutes les tâches
+ *     description: Obtenir une liste paginée des tâches avec filtrage optionnel
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Numéro de page
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Nombre d'éléments par page
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, in-progress, completed, cancelled]
+ *         description: Filtrer par statut
+ *       - in: query
+ *         name: priority
+ *         schema:
+ *           type: string
+ *           enum: [low, medium, high, urgent]
+ *         description: Filtrer par priorité
+ *       - in: query
+ *         name: assignedTo
+ *         schema:
+ *           type: integer
+ *         description: Filtrer par utilisateur assigné
+ *     responses:
+ *       200:
+ *         description: Liste des tâches
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Task'
+ *                 pagination:
+ *                   type: object
+ *                 filters:
+ *                   type: object
+ */
 router.get('/', (req, res) => {
   logger.info('Récupération de toutes les tâches');
 
@@ -117,7 +170,63 @@ router.get('/:id', (req, res) => {
   res.json({ data: task });
 });
 
-// POST /api/tasks - Créer une nouvelle tâche
+/**
+ * @swagger
+ * /api/tasks:
+ *   post:
+ *     summary: Créer une nouvelle tâche
+ *     description: Créer une nouvelle tâche dans le système
+ *     tags: [Tasks]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - description
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 200
+ *                 example: "Finaliser le projet CI/CD"
+ *               description:
+ *                 type: string
+ *                 minLength: 10
+ *                 maxLength: 1000
+ *                 example: "Compléter la documentation et les tests"
+ *               status:
+ *                 type: string
+ *                 enum: [pending, in-progress, completed, cancelled]
+ *                 default: pending
+ *               priority:
+ *                 type: string
+ *                 enum: [low, medium, high, urgent]
+ *                 default: medium
+ *               assignedTo:
+ *                 type: integer
+ *                 example: 1
+ *               dueDate:
+ *                 type: string
+ *                 format: date
+ *                 example: "2023-12-31"
+ *     responses:
+ *       201:
+ *         description: Tâche créée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Task'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ */
 router.post('/', validateRequest(createTaskSchema), (req, res) => {
   const taskData = req.validatedBody;
 

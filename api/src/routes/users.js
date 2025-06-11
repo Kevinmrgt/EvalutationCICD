@@ -24,7 +24,58 @@ const updateUserSchema = Joi.object({
   role: Joi.string().valid('admin', 'user').optional(),
 });
 
-// GET /api/users - Récupérer tous les utilisateurs
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     description: Obtenir une liste paginée des utilisateurs avec filtrage optionnel
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Numéro de page
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Nombre d'éléments par page
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [admin, user]
+ *         description: Filtrer par rôle
+ *     responses:
+ *       200:
+ *         description: Liste des utilisateurs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     totalUsers:
+ *                       type: integer
+ *                     hasNext:
+ *                       type: boolean
+ *                     hasPrev:
+ *                       type: boolean
+ */
 router.get('/', (req, res) => {
   logger.info('Récupération de tous les utilisateurs');
 
@@ -54,7 +105,33 @@ router.get('/', (req, res) => {
   });
 });
 
-// GET /api/users/:id - Récupérer un utilisateur par ID
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Récupérer un utilisateur par ID
+ *     description: Obtenir les détails d'un utilisateur spécifique
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Détails de l'utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.get('/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const user = users.find((u) => u.id === id);
@@ -73,7 +150,59 @@ router.get('/:id', (req, res) => {
   res.json({ data: user });
 });
 
-// POST /api/users - Créer un nouvel utilisateur
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Créer un nouvel utilisateur
+ *     description: Créer un nouvel utilisateur dans le système
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 100
+ *                 example: "Jean Dupont"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "jean.dupont@example.com"
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user]
+ *                 default: user
+ *                 example: "user"
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur créé avec succès"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       409:
+ *         description: Email déjà utilisé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/', validateRequest(createUserSchema), (req, res) => {
   const { name, email, role = 'user' } = req.validatedBody;
 
@@ -106,7 +235,64 @@ router.post('/', validateRequest(createUserSchema), (req, res) => {
   });
 });
 
-// PUT /api/users/:id - Mettre à jour un utilisateur
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Mettre à jour un utilisateur
+ *     description: Modifier les informations d'un utilisateur existant
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 100
+ *                 example: "Jean Dupont"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "jean.dupont@example.com"
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user]
+ *                 example: "admin"
+ *     responses:
+ *       200:
+ *         description: Utilisateur mis à jour avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur mis à jour avec succès"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       409:
+ *         description: Email déjà utilisé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.put('/:id', validateRequest(updateUserSchema), (req, res) => {
   const id = parseInt(req.params.id);
   const userIndex = users.findIndex((u) => u.id === id);
@@ -148,7 +334,36 @@ router.put('/:id', validateRequest(updateUserSchema), (req, res) => {
   });
 });
 
-// DELETE /api/users/:id - Supprimer un utilisateur
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Supprimer un utilisateur
+ *     description: Supprimer définitivement un utilisateur du système
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Utilisateur supprimé avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur supprimé avec succès"
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ */
 router.delete('/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const userIndex = users.findIndex((u) => u.id === id);
