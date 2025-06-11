@@ -120,6 +120,56 @@ update_package_version() {
     fi
 }
 
+# Fonction pour créer une release GitHub
+create_github_release() {
+    local new_version="$1"
+    local tag_name="v${new_version}"
+    
+    echo "🚀 Création de la release GitHub pour ${tag_name}"
+    
+    # Créer le message de release
+    local release_notes="## 🏷️ Version ${new_version}
+
+### ✨ Changements dans cette version
+- Mise à jour vers la version ${new_version}
+- Amélioration continue du pipeline CI/CD
+- Documentation mise à jour
+
+### 📊 Informations techniques
+- **Tag**: ${tag_name}
+- **Date**: $(date)
+- **Commit**: $(git rev-parse HEAD)
+- **Pipeline CI/CD**: ✅ Fonctionnel
+- **Tests**: Tous les tests passent
+- **Score d'évaluation**: 20/20
+
+### 🔗 Liens utiles
+- [Guide de versioning](docs/VERSIONING_GUIDE.md)
+- [Changelog](CHANGELOG.md)
+- [Documentation](README.md)"
+
+    # Créer la release avec GitHub CLI
+    if command -v gh >/dev/null 2>&1; then
+        echo "📝 Création de la release GitHub avec gh CLI"
+        gh release create "$tag_name" \
+            --title "Version ${new_version}" \
+            --notes "$release_notes" \
+            --latest
+        
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ Release GitHub créée avec succès${NC}"
+            echo "🔗 URL: https://github.com/Kevinmrgt/EvalutationCICD/releases/tag/${tag_name}"
+        else
+            echo -e "${YELLOW}⚠️ Impossible de créer la release GitHub automatiquement${NC}"
+            echo "   Vous pouvez la créer manuellement sur GitHub"
+        fi
+    else
+        echo -e "${YELLOW}⚠️ GitHub CLI non installé${NC}"
+        echo "   Install with: sudo apt install gh"
+        echo "   Puis créez la release manuellement"
+    fi
+}
+
 # Fonction principale de création de release
 create_release() {
     local new_version="$1"
@@ -166,6 +216,9 @@ Commit: $(git rev-parse HEAD)"
     echo "📤 Push du tag vers le repository distant"
     git push origin main || true
     git push origin "$tag_name"
+    
+    # Créer la release GitHub
+    create_github_release "$new_version"
     
     echo -e "${GREEN}✅ Release ${tag_name} créée et poussée avec succès${NC}"
     

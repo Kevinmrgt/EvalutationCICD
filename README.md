@@ -5,6 +5,10 @@
 [![Security](https://github.com/kevinmrgt/evalutationcicd/actions/workflows/security.yml/badge.svg)](https://github.com/kevinmrgt/evalutationcicd/actions/workflows/security.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[![Version](https://img.shields.io/github/v/tag/Kevinmrgt/EvalutationCICD?label=Version&color=blue)](https://github.com/Kevinmrgt/EvalutationCICD/tags)
+[![Latest Release](https://img.shields.io/github/v/release/Kevinmrgt/EvalutationCICD?label=Latest%20Release&color=green)](https://github.com/Kevinmrgt/EvalutationCICD/releases/latest)
+[![GitHub commits](https://img.shields.io/github/commits-since/Kevinmrgt/EvalutationCICD/v1.1.2?label=Commits%20since%20latest&color=orange)](https://github.com/Kevinmrgt/EvalutationCICD/commits/main)
+
 > **Projet d'évaluation CI/CD** - API REST Node.js avec pipeline de déploiement automatisé
 
 ## 🎯 Description
