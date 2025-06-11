@@ -1,6 +1,6 @@
 {
   "name": "evalutationcicd",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Projet d'évaluation CI/CD - API REST avec pipeline complet de déploiement automatisé",
   "main": "api/src/app.js",
   "scripts": {
