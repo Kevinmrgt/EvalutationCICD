@@ -8,21 +8,6 @@
 
 ## 📋 État d'avancement - LIVRABLE COMPLET
 
-> 🎯 **SCORE FINAL : 20/20** ✅ **OBJECTIF ATTEINT !**
-
-### 📊 Récapitulatif d'évaluation
-
-| Critère | Points | État | Score |
-|---------|--------|------|-------|
-| Infrastructure Terraform | 3 | ✅ Complet | 3/3 |
-| Configuration Ansible | 3 | ✅ Complet | 3/3 |
-| Pipeline CI/CD | 3 | ✅ Complet | 3/3 |
-| Logs et monitoring | 2 | ✅ Avancé | 2/2 |
-| Snapshots | 2 | ✅ Automatisé | 2/2 |
-| Rollback | 2 | ✅ Sécurisé | 2/2 |
-| GitFlow | 2 | ✅ Structuré | 2/2 |
-| Versionnement SemVer | 1 | ✅ Automatisé | 1/1 |
-| Documentation | 2 | ✅ Complète | 2/2 |
 
 **📋 Livrable détaillé disponible dans [`livrable.md`](./livrable.md)**
 
@@ -258,19 +243,3 @@ evalutationcicd/
 ├── scripts/               # Utilitaires d'automatisation
 └── docs/                  # Documentation technique
 ```
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/amazing-feature`)
-3. Commit les changements (`git commit -m 'Add amazing feature'`)
-4. Push vers la branche (`git push origin feature/amazing-feature`)
-5. Ouvrir une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
----
-
-**Développé avec ❤️ pour l'évaluation DevOps YNOV** 

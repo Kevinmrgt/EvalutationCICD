@@ -197,11 +197,3 @@ EvaluationCICD/                     ✅ Racine du projet
 - ✅ **Endpoints documentés** : Users, Tasks, Health checks
 - 📁 **Fichiers** : `api/src/config/swagger.js`, documentation intégrée
 
-### **🔶 PRIORITÉ MOYENNE - AMÉLIORATIONS**
-
-#### **4. Couverture de tests**
-- ⚠️ **Actuel** : 70.77% (objectif : >80%)
-- 🎯 **Action** : Ajouter tests pour errorMiddleware.js, Task.js
-- 📁 **Fichiers** : Tests manquants dans certains modules
-
----
