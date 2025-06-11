@@ -72,13 +72,17 @@
 
   1. Exécution complète du pipeline CI/CD
 
-
+![](docs/screenshots/screenpipeline.png)
   
   2. Interface de staging déployée
   3. Interface de production déployée
   4. Vue des branches Git
+  ![](docs/screenshots/screen_branch.png)
   5. Historique de commits (main, develop)
+  ![](docs/screenshots/screen_commit_main.png)
+  ![](docs/screenshots/screen_commit_develop.png)
   6. Tag Git/version utilisé
+  
   7. Dashboard/logs de monitoring
   8. Déclenchement de snapshot
   9. Procédure de rollback + état restauré
