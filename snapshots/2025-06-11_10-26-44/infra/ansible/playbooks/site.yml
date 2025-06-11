@@ -1,0 +1,195 @@
+---
+# Playbook principal pour le déploiement complet de l'infrastructure CI/CD Node.js
+# Ce playbook orchestre l'installation et la configuration de tous les composants
+
+- name: '🚀 CI/CD Node.js - Déploiement complet'
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    deployment_timestamp: '{{ ansible_date_time.epoch }}'
+    deployment_id: 'deploy-{{ deployment_timestamp }}'
+
+  tasks:
+    - name: '📋 Affichage des informations de déploiement'
+      debug:
+        msg:
+          - '=== Déploiement CI/CD Node.js ==='
+          - 'ID de déploiement: {{ deployment_id }}'
+          - 'Timestamp: {{ ansible_date_time.iso8601 }}'
+          - 'Utilisateur: {{ ansible_user_id }}'
+          - "Environnement cible: {{ target_environment | default('development') }}"
+
+    - name: '📦 Validation des prérequis'
+      include_tasks: tasks/validate-prerequisites.yml
+
+# Configuration des serveurs web
+- name: '🌐 Configuration des serveurs web'
+  hosts: web_servers
+  become: true
+  gather_facts: true
+  serial: "{{ deployment_serial | default('50%') }}"
+  max_fail_percentage: 10
+
+  vars:
+    deployment_strategy: "{{ deployment_strategy | default('rolling') }}"
+    health_check_retries: 5
+    health_check_delay: 10
+
+  pre_tasks:
+    - name: '🔍 Vérification de la connectivité'
+      ping:
+
+    - name: '📊 Collecte des facts système'
+      setup:
+        gather_subset:
+          - hardware
+          - network
+          - virtual
+
+    - name: '🏷️ Application des tags de déploiement'
+      set_fact:
+        server_tags:
+          deployment_id: '{{ deployment_id }}'
+          deployment_time: '{{ ansible_date_time.iso8601 }}'
+          ansible_managed: true
+
+  roles:
+    - role: common
+      tags: [common, base]
+    - role: security
+      tags: [security, hardening]
+    - role: monitoring
+      tags: [monitoring, observability]
+    - role: nodejs
+      tags: [nodejs, runtime]
+    - role: application
+      tags: [app, deployment]
+
+  post_tasks:
+    - name: '🏥 Vérification de santé post-déploiement'
+      include_tasks: tasks/health-check.yml
+
+    - name: '📝 Enregistrement du déploiement'
+      include_tasks: tasks/record-deployment.yml
+
+# Configuration des serveurs de base de données
+- name: '🗄️ Configuration des serveurs de base de données'
+  hosts: database_servers
+  become: true
+  gather_facts: true
+  serial: 1 # Déploiement séquentiel pour les bases de données
+
+  vars:
+    backup_before_update: true
+
+  pre_tasks:
+    - name: '🔍 Vérification de la connectivité base de données'
+      ping:
+
+    - name: '💾 Sauvegarde pré-déploiement'
+      include_tasks: tasks/database-backup.yml
+      when: backup_before_update | bool
+
+  roles:
+    - role: common
+      tags: [common, base]
+    - role: security
+      tags: [security, hardening]
+    - role: database
+      tags: [database, postgres]
+    - role: monitoring
+      tags: [monitoring, observability]
+
+  post_tasks:
+    - name: '🏥 Vérification de santé base de données'
+      include_tasks: tasks/database-health-check.yml
+
+# Déploiement de l'application
+- name: "📱 Déploiement de l'application Node.js"
+  hosts: web_servers
+  become: true
+  gather_facts: false
+  serial: "{{ app_deployment_serial | default('25%') }}"
+
+  vars:
+    app_version: "{{ app_version | default('latest') }}"
+    rollback_enabled: true
+    zero_downtime: true
+
+  pre_tasks:
+    - name: '🔄 Préparation du déploiement rolling'
+      include_tasks: tasks/prepare-rolling-deployment.yml
+      when: deployment_strategy == 'rolling'
+
+  roles:
+    - role: application-deploy
+      tags: [deploy, application]
+
+  post_tasks:
+    - name: '🏥 Test de santé application'
+      include_tasks: tasks/application-health-check.yml
+
+    - name: '🔄 Mise à jour du load balancer'
+      include_tasks: tasks/update-load-balancer.yml
+      when: zero_downtime | bool
+
+# Tests de validation
+- name: '🧪 Tests de validation end-to-end'
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: '🔍 Tests de connectivité'
+      include_tasks: tasks/connectivity-tests.yml
+
+    - name: '🌐 Tests de charge légère'
+      include_tasks: tasks/load-tests.yml
+      when: run_load_tests | default(false) | bool
+
+    - name: '📊 Vérification des métriques'
+      include_tasks: tasks/metrics-validation.yml
+
+# Nettoyage et finalisation
+- name: '🧹 Nettoyage et finalisation'
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: '🗑️ Nettoyage des artefacts temporaires'
+      include_tasks: tasks/cleanup.yml
+
+    - name: '📧 Notification de fin de déploiement'
+      include_tasks: tasks/notify-completion.yml
+      when: notifications_enabled | default(true) | bool
+
+# Rapport final
+- name: '📊 Génération du rapport de déploiement'
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: '📋 Génération du rapport'
+      template:
+        src: deployment-report.j2
+        dest: './reports/deployment-{{ deployment_id }}.yml'
+        mode: '0644'
+      vars:
+        deployment_summary:
+          id: '{{ deployment_id }}'
+          timestamp: '{{ ansible_date_time.iso8601 }}'
+          environment: "{{ target_environment | default('development') }}"
+          strategy: '{{ deployment_strategy }}'
+          version: "{{ app_version | default('latest') }}"
+          duration: "{{ ansible_play_duration | default('N/A') }}"
+
+    - name: '🎉 Déploiement terminé avec succès!'
+      debug:
+        msg:
+          - '✅ Déploiement {{ deployment_id }} terminé avec succès'
+          - '🌐 Application accessible via le load balancer'
+          - '📊 Rapport disponible: ./reports/deployment-{{ deployment_id }}.yml'
+          - '📝 Logs détaillés: ./logs/ansible.log'

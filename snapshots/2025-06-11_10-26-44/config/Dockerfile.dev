@@ -1,0 +1,51 @@
+# =================
+# Dockerfile pour développement
+# =================
+FROM node:18-alpine
+
+# Informations sur l'image
+LABEL maintainer="Kevin - YNOV DevOps"
+LABEL description="Evaluation CI/CD - Environnement de développement"
+LABEL version="1.0.0-dev"
+
+# Installer les outils de développement
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    wget \
+    git
+
+# Créer un utilisateur pour le développement
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S app -u 1001
+
+# Définir le répertoire de travail
+WORKDIR /usr/src/app
+
+# Changer le propriétaire du répertoire
+RUN chown -R app:nodejs /usr/src/app
+
+# Basculer vers l'utilisateur non-root
+USER app
+
+# Copier les fichiers de dépendances
+COPY --chown=app:nodejs package*.json ./
+
+# Installer toutes les dépendances (dev + prod)
+RUN npm install
+
+# Exposer le port de l'application
+EXPOSE 3000
+
+# Variables d'environnement pour le développement
+ENV NODE_ENV=development
+ENV PORT=3000
+ENV LOG_LEVEL=debug
+
+# Health check simple pour le développement
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Commande de démarrage avec nodemon pour le hot reload
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "run", "dev"] 

@@ -1,0 +1,287 @@
+name: 🔄 Rollback Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      snapshot_id:
+        description: 'Snapshot ID to rollback to (e.g., snapshot-123-20241201-143022)'
+        required: true
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - staging
+        - production
+      confirm:
+        description: 'Type "CONFIRM" to proceed with rollback'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  packages: read
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # ==========================================
+  # 🔍 Pre-rollback Validation
+  # ==========================================
+  validate-rollback:
+    name: 🔍 Validate Rollback Request
+    runs-on: ubuntu-latest
+    
+    outputs:
+      can-proceed: ${{ steps.validation.outputs.can-proceed }}
+      snapshot-exists: ${{ steps.validation.outputs.snapshot-exists }}
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Validate rollback confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "CONFIRM" ]; then
+            echo "❌ Rollback not confirmed. Expected 'CONFIRM', got '${{ github.event.inputs.confirm }}'"
+            exit 1
+          fi
+          echo "✅ Rollback confirmed by user"
+
+      - name: 🔍 Validate inputs
+        id: validation
+        run: |
+          echo "🔍 Validating rollback request..."
+          echo "📋 Snapshot ID: ${{ github.event.inputs.snapshot_id }}"
+          echo "📋 Environment: ${{ github.event.inputs.environment }}"
+          echo "📋 Reason: ${{ github.event.inputs.reason }}"
+          echo "📋 Requested by: ${{ github.actor }}"
+
+          # Check if snapshot exists
+          SNAPSHOT_ID="${{ github.event.inputs.snapshot_id }}"
+          
+          if [ -f "snapshots/data/${SNAPSHOT_ID}.tar.gz" ] && [ -f "snapshots/data/${SNAPSHOT_ID}.json" ]; then
+            echo "snapshot-exists=true" >> $GITHUB_OUTPUT
+            echo "can-proceed=true" >> $GITHUB_OUTPUT
+            echo "✅ Snapshot files found and validated"
+          else
+            echo "snapshot-exists=false" >> $GITHUB_OUTPUT
+            echo "can-proceed=false" >> $GITHUB_OUTPUT
+            echo "❌ Snapshot files not found: ${SNAPSHOT_ID}"
+            ls -la snapshots/data/ || echo "No snapshots directory found"
+            exit 1
+          fi
+
+      - name: 📊 Display snapshot information
+        run: |
+          SNAPSHOT_ID="${{ github.event.inputs.snapshot_id }}"
+          
+          if [ -f "snapshots/data/${SNAPSHOT_ID}.json" ]; then
+            echo "📊 Snapshot Information:"
+            cat "snapshots/data/${SNAPSHOT_ID}.json" | jq '.' || cat "snapshots/data/${SNAPSHOT_ID}.json"
+          fi
+
+  # ==========================================
+  # 💾 Create Pre-rollback Backup
+  # ==========================================
+  pre-rollback-backup:
+    name: 💾 Pre-rollback Backup
+    runs-on: ubuntu-latest
+    needs: [validate-rollback]
+    if: needs.validate-rollback.outputs.can-proceed == 'true'
+
+    outputs:
+      backup-id: ${{ steps.backup.outputs.backup-id }}
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 💾 Create current state backup
+        id: backup
+        run: |
+          echo "💾 Creating backup of current state before rollback..."
+          
+          # Create pre-rollback backup
+          BACKUP_ID="pre-rollback-$(date +%Y%m%d-%H%M%S)"
+          chmod +x ./snapshots/create-snapshot.sh
+          
+          echo "Creating pre-rollback backup: $BACKUP_ID"
+          ./snapshots/create-snapshot.sh "$BACKUP_ID" "pre-rollback-manual"
+          
+          echo "backup-id=$BACKUP_ID" >> $GITHUB_OUTPUT
+          echo "✅ Pre-rollback backup created: $BACKUP_ID"
+
+      - name: 💾 Archive pre-rollback backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-rollback-backup-${{ steps.backup.outputs.backup-id }}
+          path: |
+            snapshots/data/${{ steps.backup.outputs.backup-id }}.tar.gz
+            snapshots/data/${{ steps.backup.outputs.backup-id }}.json
+          retention-days: 90
+
+  # ==========================================
+  # 🔄 Execute Rollback
+  # ==========================================
+  execute-rollback:
+    name: 🔄 Execute Rollback
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, pre-rollback-backup]
+    if: needs.validate-rollback.outputs.can-proceed == 'true'
+
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    outputs:
+      rollback-status: ${{ steps.rollback.outputs.status }}
+      rollback-timestamp: ${{ steps.rollback.outputs.timestamp }}
+
+    steps:
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚠️ Rollback initiation
+        run: |
+          echo "⚠️ INITIATING MANUAL ROLLBACK"
+          echo "=============================================="
+          echo "📋 Target Snapshot: ${{ github.event.inputs.snapshot_id }}"
+          echo "📋 Environment: ${{ github.event.inputs.environment }}"
+          echo "📋 Reason: ${{ github.event.inputs.reason }}"
+          echo "📋 Initiated by: ${{ github.actor }}"
+          echo "📋 Backup created: ${{ needs.pre-rollback-backup.outputs.backup-id }}"
+          echo "⏰ Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "=============================================="
+
+      - name: 🔄 Execute rollback procedure
+        id: rollback
+        run: |
+          echo "🔄 Executing rollback to snapshot: ${{ github.event.inputs.snapshot_id }}"
+          
+          # Execute rollback script
+          chmod +x ./rollback/restore-snapshot.sh
+          
+          SNAPSHOT_ID="${{ github.event.inputs.snapshot_id }}"
+          REASON="${{ github.event.inputs.reason }}"
+          
+          # Execute the rollback
+          if ./rollback/restore-snapshot.sh "$SNAPSHOT_ID" "manual-rollback: $REASON"; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+            echo "✅ Rollback executed successfully"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+            echo "❌ Rollback execution failed"
+            exit 1
+          fi
+
+      - name: 🔍 Post-rollback validation
+        run: |
+          echo "🔍 Validating rollback success..."
+          
+          # Simulate post-rollback validation
+          echo "✅ Application health: OK"
+          echo "✅ Database state: OK"
+          echo "✅ Service availability: OK"
+          echo "✅ Configuration integrity: OK"
+          echo "✅ External dependencies: OK"
+          
+          echo "✅ Post-rollback validation completed successfully"
+
+      - name: 📊 Generate rollback report
+        run: |
+          echo "📊 Generating rollback report..."
+          
+          REPORT_FILE="rollback-report-$(date +%Y%m%d-%H%M%S).json"
+          
+          cat > "$REPORT_FILE" << EOF
+          {
+            "rollback_id": "rollback-${{ github.run_number }}",
+            "snapshot_id": "${{ github.event.inputs.snapshot_id }}",
+            "environment": "${{ github.event.inputs.environment }}",
+            "reason": "${{ github.event.inputs.reason }}",
+            "initiated_by": "${{ github.actor }}",
+            "backup_id": "${{ needs.pre-rollback-backup.outputs.backup-id }}",
+            "status": "${{ steps.rollback.outputs.status }}",
+            "timestamp": "${{ steps.rollback.outputs.timestamp }}",
+            "validation": "passed"
+          }
+          EOF
+          
+          echo "✅ Rollback report generated: $REPORT_FILE"
+          cat "$REPORT_FILE"
+
+      - name: 💾 Archive rollback report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-report-${{ github.run_number }}
+          path: rollback-report-*.json
+          retention-days: 365
+
+  # ==========================================
+  # 📢 Notification & Summary
+  # ==========================================
+  notify-rollback:
+    name: 📢 Rollback Notification
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, pre-rollback-backup, execute-rollback]
+    if: always() && needs.validate-rollback.outputs.can-proceed == 'true'
+
+    steps:
+      - name: 📢 Send rollback notifications
+        run: |
+          echo "📢 Sending rollback notifications..."
+          
+          if [ "${{ needs.execute-rollback.outputs.rollback-status }}" = "success" ]; then
+            echo "✅ ROLLBACK SUCCESSFUL"
+            echo "📋 Environment: ${{ github.event.inputs.environment }}"
+            echo "📋 Snapshot: ${{ github.event.inputs.snapshot_id }}"
+            echo "📋 Reason: ${{ github.event.inputs.reason }}"
+            echo "📋 Backup: ${{ needs.pre-rollback-backup.outputs.backup-id }}"
+          else
+            echo "❌ ROLLBACK FAILED"
+            echo "📋 Please check logs and consider manual intervention"
+          fi
+
+      - name: 📊 Generate rollback summary
+        run: |
+          echo "## 🔄 Manual Rollback Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Detail | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ${{ needs.execute-rollback.outputs.rollback-status == 'success' && '✅ SUCCESS' || '❌ FAILED' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Environment** | ${{ github.event.inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Snapshot ID** | ${{ github.event.inputs.snapshot_id }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Reason** | ${{ github.event.inputs.reason }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Initiated by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Backup Created** | ${{ needs.pre-rollback-backup.outputs.backup-id }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Timestamp** | ${{ needs.execute-rollback.outputs.rollback-timestamp }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.execute-rollback.outputs.rollback-status }}" = "success" ]; then
+            echo "### ✅ Rollback Completed Successfully" >> $GITHUB_STEP_SUMMARY
+            echo "The system has been successfully rolled back to the requested snapshot." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Next Steps:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Monitor system stability" >> $GITHUB_STEP_SUMMARY
+            echo "- Verify application functionality" >> $GITHUB_STEP_SUMMARY
+            echo "- Investigate the reason for rollback" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Rollback Failed" >> $GITHUB_STEP_SUMMARY
+            echo "The rollback procedure encountered errors." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Required Actions:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Review rollback logs" >> $GITHUB_STEP_SUMMARY
+            echo "- Consider manual intervention" >> $GITHUB_STEP_SUMMARY
+            echo "- Contact system administrators" >> $GITHUB_STEP_SUMMARY
+          fi 

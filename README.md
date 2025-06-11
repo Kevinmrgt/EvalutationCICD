@@ -311,12 +311,37 @@ Le projet utilise un système de versionnement sémantique automatisé :
 - **Playbooks idempotents** pour configuration cohérente
 - **Variables chiffrées** avec Ansible Vault
 
-### Pipeline CI/CD
-- **Tests automatisés** sur chaque commit
-- **Build Docker** avec multi-stage
-- **Scans de sécurité** (Snyk, npm audit)
-- **Déploiement automatique** selon les branches
-- **Notifications** Slack/Teams en cas d'erreur
+### Pipeline CI/CD (explication + lien vers les fichiers)
+
+Le pipeline CI/CD suit exactement la structure demandée avec les étapes suivantes :
+
+#### 🚀 Pipeline Principal (`.github/workflows/pipeline.yml`)
+1. **🔍 Lint** - Vérification de la qualité et du formatage du code
+2. **🧪 Test** - Tests unitaires, d'intégration et de couverture de code
+3. **🏗️ Build** - Compilation de l'application et création des artefacts
+4. **📦 Packaging** - Création et test de l'image Docker
+5. **🧪 Déploiement staging** - Déploiement automatique en environnement de test
+6. **🌟 Déploiement production** - Déploiement en production (main branch)
+7. **📸 Snapshot** - Création automatique de sauvegarde post-déploiement
+8. **🔄 Rollback** - Restauration automatique en cas d'échec
+
+#### 🔄 Rollback Manuel (`.github/workflows/rollback-manual.yml`)
+- **Rollback à la demande** via interface GitHub Actions
+- **Validation des snapshots** disponibles
+- **Sauvegarde pré-rollback** pour sécurité maximale
+- **Validation post-rollback** automatique
+
+#### 🛠️ Outils et Scripts
+```bash
+# Lister les snapshots disponibles pour rollback
+./scripts/list-snapshots.sh
+
+# Voir les snapshots en format tableau
+./scripts/list-snapshots.sh --format=table
+
+# Voir les snapshots en format JSON
+./scripts/list-snapshots.sh --format=json
+```
 
 ## 📚 Documentation
 
